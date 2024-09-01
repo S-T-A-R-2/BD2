@@ -9,7 +9,7 @@ Entre esas cosas voy a poner los links de tutoriales y cosas que parezcan utiles
 
 ### Links
 
-[Quick Start React official tutorial](https://react.dev/learn)
+[Quick Start React official tutorial](https://react.dev/learn) \
 [Geeks for Geeks React Quick start](https://www.w3schools.com/react/react_getstarted.asp)
 
 ### Algo no sé
