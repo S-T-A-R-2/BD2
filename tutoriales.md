@@ -34,4 +34,4 @@ En ese archivo puse unas funciones (componentes): Button() y TextField()
 Luego las importé a App.js y las usé para crear un logín simple
 Muy probablemente no es así como se debería hacer, pero por lo menos logré crear una "interfaz" sin usar html
 
-![TerceraCorrida](Imagener/terceraCorrida.png)
+![TerceraCorrida](Imagenes/terceraCorrida.png)
