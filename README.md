@@ -6,4 +6,4 @@ Buenas, esta sección del readme es para saludar y la siguiente es para decir co
 
 
 ## Seccion para decir cosas
-Revisen [Tutorial](tutorial.md), esto es una vara que estaba siguiendo, para que la revisen
+Revisen [Tutorial](tutoriales.md), esto es una vara que estaba siguiendo, para que la revisen
