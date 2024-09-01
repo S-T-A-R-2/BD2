@@ -15,6 +15,8 @@ Entre esas cosas voy a poner los links de tutoriales y cosas que parezcan utiles
 ### Algo no sé
 
 Corrí en la carpeta del proyecto el siguiente comando para crear la aplicación de react:
+** Este es el comando para instalar react, corran eso**
+** Luego de correrlo, reemplazen la carpeta src dentro del proyecto, por la carpeta src que está aquí en el repositorio **
 
 > npx create-react-app proyecto1
 
