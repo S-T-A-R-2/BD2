@@ -45,3 +45,4 @@ Agregué una dependencia nueva que es para cambiar de páginas o algo así, si l
 ~~~
 npm install react-router-dom
 ~~~
+[Información sobre rect-router] (https://reactrouter.com/en/main/components/link)
