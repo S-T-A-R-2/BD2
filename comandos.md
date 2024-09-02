@@ -16,6 +16,7 @@ git status
 ~~~
   - Agregar los archivos
 ~~~Git
+```Git
 git add .
 git commit -m "Saludos"
 git push origin [nombre de la rama]
