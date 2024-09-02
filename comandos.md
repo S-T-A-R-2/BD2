@@ -20,7 +20,7 @@ git status
 git add .
 git commit -m "Saludos"
 git push origin [nombre de la rama]
-~~~
+```
   - Bajar cambios
 ~~~
 git pull origin [nombre de la rama]
