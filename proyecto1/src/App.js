@@ -9,11 +9,12 @@ function App() {
   return (
     <Router>
       <div>
-        <Login />
-        <h1>Hola mundo</h1>
+        <Link to="/main">MainWindow</Link>
+        <Link to="/login"><Button text = "Login" args = {[]} /> </Link>
       </div>
       <Routes>
-				<Route path="/" element = {<MainWindow />} />
+				<Route path="/main" element = {<MainWindow />} />
+        <Route path="/login" element = {<Login />} />
 			</Routes>
     </Router>
   );

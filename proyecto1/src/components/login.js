@@ -8,6 +8,7 @@ export const Login = () => {
 	const ValidateUser = (user, pass) => {
 		//llamar a la base de datos
 		var a = 9
+		alert("No hay sistema");
 	}
 	//Imprimir error
 	return (
@@ -18,8 +19,7 @@ export const Login = () => {
 				<br />
 				<TextField oldText = {password} onChange = {setPassword}/> <p>Pass: {password}</p>
 				<br />
-				<Button onClick = {ValidateUser} args = {[username, password]}/>
-				<Link to="/main">MainWindow</Link>
+				<Button text = "Iniciar sesión" onClick = {ValidateUser} args = {[username, password]}/>
 			</div>
 	);
 }

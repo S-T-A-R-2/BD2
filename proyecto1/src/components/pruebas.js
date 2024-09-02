@@ -3,10 +3,17 @@
 const validate_user = () => {
   var b;
 }
-export function Button({onClick, args}){
-  return (
-      <button onClick={() => onClick(...args)}>Botón épico</button>
-  );
+export function Button({onClick, text, args = []}){
+  if (args.length === 0){
+    return (
+      <button>{text}</button>
+    );
+  } else {
+    return (
+      <button onClick={() => onClick(...args)}>{text}</button>
+    );
+  }
+  
 }
 /*const changeText = (oldText, newText) => {
   oldText = newText;
