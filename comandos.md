@@ -15,7 +15,7 @@ npm start
 git status
 ~~~
   - Agregar los archivos
-~~~
+~~~Git
 git add .
 git commit -m "Saludos"
 git push origin [nombre de la rama]
