@@ -1,0 +1,18 @@
+//En la cosa de React oficial, Quick Start dice que las aplicaciones de React estan hechas por componentes, supongo qu esto cuenta como componente 
+//Le pongo export para luego importarlo al archivo App.js
+const validate_user = () => {
+  var b;
+}
+export function Button({onClick, args}){
+  return (
+      <button onClick={() => onClick(...args)}>Botón épico</button>
+  );
+}
+/*const changeText = (oldText, newText) => {
+  oldText = newText;
+}*/
+export function TextField({oldText, onChange}){
+  return (
+    <input type="text" onChange={e => onChange(e.target.value)}></input>
+  );
+} 
