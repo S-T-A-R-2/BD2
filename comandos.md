@@ -15,7 +15,7 @@ npm start
 git status
 ~~~
   - Agregar los archivos
-~~~Git
+
 ```Git
 git add .
 git commit -m "Saludos"
