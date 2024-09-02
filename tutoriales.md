@@ -35,3 +35,13 @@ Luego las importé a App.js y las usé para crear un logín simple
 Muy probablemente no es así como se debería hacer, pero por lo menos logré crear una "interfaz" sin usar html
 
 ![TerceraCorrida](Imagenes/terceraCorrida.png)
+
+# Nota
+Si algo les da error por alguna dependencia ejecuten de nuevo 
+~~~
+npm install
+~~~
+Agregué una dependencia nueva que es para cambiar de páginas o algo así, si les falla algo tratan de instalar esa es:
+~~~
+npm install react-router-dom
+~~~
