@@ -1,6 +1,7 @@
 # BD2 proyecto 1
 Esto es un repositorio
 
+En verdad es una rama de un repositorio
 ## Seccion para saludar 
 Buenas, esta sección del readme es para saludar y la siguiente es para decir cosas
 
