@@ -1,7 +1,7 @@
 import React, {useState} from 'react'
-import { Button,TextField } from './pruebas.js';
+import { Button,TextField } from '../components/pruebas.js';
 
-export const MainWindow = () => {
+export const MainPage = () => {
 	const [username, setUsername] = useState("Página principal");
 	const [password, setPassword] = useState("");
 	const ValidateUser = (user, pass) => {
@@ -22,4 +22,4 @@ export const MainWindow = () => {
 		</div>
 	);
 }
-export default RegisterPage
+export default MainPage

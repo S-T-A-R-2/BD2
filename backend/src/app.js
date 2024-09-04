@@ -1,16 +1,20 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import repositoriesRoutes from "./routes/repository.route.js"
+import authRoutes from './routes/auth.route.js'
+
 import cors from 'cors';
 import {connectDB} from './db.js'
 connectDB();
 const app = express();
 //app.use(morgan("dev"));
+app.use(cors({origin: 'http://localhost:3000'}));
 app.use(express.json());
-app.use(cors());
+
 
 
 app.use("/api", repositoriesRoutes);
+app.use("/api", authRoutes);
 app.get("/", (req, resp) => {
 
     resp.send("App is Working");

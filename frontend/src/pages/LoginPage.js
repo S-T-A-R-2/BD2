@@ -1,8 +1,8 @@
 import React, {useState} from 'react'
-import { Button,TextField } from './pruebas.js';
+import { Button,TextField } from '../components/pruebas.js';
 import { BrowserRouter as Router, Link, Switch, Routes, Route } from 'react-router-dom';
 import { MainWindow } from './MainPage.js';
-export const Login = () => {
+export const LoginPage = () => {
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 	const ValidateUser = (user, pass) => {
@@ -23,3 +23,4 @@ export const Login = () => {
 			</div>
 	);
 }
+export default LoginPage
