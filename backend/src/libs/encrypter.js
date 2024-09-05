@@ -1,5 +1,11 @@
 import crypto from 'crypto'
 
+//Para usar instanciar la clase
+//El constructor toma la llave en .env como parámetro 
+//Para acceder a la llave se usa procesos.env.ENCRYPT_KEY
+//Luega para encriptar/desencriptar nada más usar la instancia y los métodos 
+
+
 export default class Encrypter {
     constructor(encryptionKey) {
       this.algorithm = "aes-192-cbc";
