@@ -1,14 +1,30 @@
 import User from '../models/user.model.js'
 import {redisClient} from '../db.js'
+import Encrypter from '../libs/encrypter.js'
+
+
+
 export const register = async (req, res) => {
     const {email, password, username} = req.body;
     //User.create()
+
+    console.log(email)
+
+    //Encryption
+    const encrypter = new Encrypter(process.env.ENCRYPT_KEY)
+    const email_e = encrypter.encrypt(email);
+    const password_e = encrypter.encrypt(password);
+
+    console.error(email_e)
+
     try {
         const user = {
-            email: email,
-            password: password
+            email: email_e,
+            password: password_e
         };
+
         const userJson = JSON.stringify(user);
+
         await redisClient.set(username, userJson);
         /*await redisClient.hSet(username, {
         email: email,

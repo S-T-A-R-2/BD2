@@ -12,6 +12,7 @@ import RegisterPage from './pages/RegisterPage';
         </div>*/
 function App() {
   return (
+    <div className='bg-zinc-800'>
     <BrowserRouter>
       <Routes>
         <Route path="/" element = {<MainPage />} />
@@ -20,6 +21,7 @@ function App() {
         <Route path="/repositories" element = {<h1>Repositorios</h1>} />
       </Routes>
     </BrowserRouter>
+    </div>
   );
 }
 
