@@ -2,7 +2,7 @@ import crypto from 'crypto'
 
 //Para usar instanciar la clase
 //El constructor toma la llave en .env como parámetro 
-//Para acceder a la llave se usa procesos.env.ENCRYPT_KEY
+//Para acceder a la llave se usa process.env.ENCRYPT_KEY
 //Luega para encriptar/desencriptar nada más usar la instancia y los métodos 
 
 
