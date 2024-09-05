@@ -1,5 +1,4 @@
 import React, {useState} from 'react'
-import { Button,TextField } from '../components/pruebas.js';
 import { BrowserRouter as Router, Link, Switch, Routes, Route } from 'react-router-dom';
 import { MainWindow } from './MainPage.js';
 export const LoginPage = () => {
@@ -14,12 +13,9 @@ export const LoginPage = () => {
 	return (
 			<div>
 				<h1>Digite su nombre de usuario</h1>
-				<h1>Login Épico</h1>
-				<TextField oldText = {username} onChange = {setUsername}/> <p>Usuario: {username}</p>
 				<br />
-				<TextField oldText = {password} onChange = {setPassword}/> <p>Pass: {password}</p>
 				<br />
-				<Button text = "Iniciar sesión" onClick = {ValidateUser} args = {[username, password]}/>
+				<button>Login</button>
 			</div>
 	);
 }

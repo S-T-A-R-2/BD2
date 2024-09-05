@@ -8,14 +8,10 @@ export const register = async (req, res) => {
     const {email, password, username} = req.body;
     //User.create()
 
-    console.log(email)
-
     //Encryption
     const encrypter = new Encrypter(process.env.ENCRYPT_KEY)
     const email_e = encrypter.encrypt(email);
     const password_e = encrypter.encrypt(password);
-
-    console.error(email_e)
 
     try {
         const user = {

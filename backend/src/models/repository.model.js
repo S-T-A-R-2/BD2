@@ -12,10 +12,24 @@ const repositorySchema = mongoose.Schema({
         trim:  true,
         unique: true
     },
-    files: [{
+    description: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    branches: [{
+        name: {
+            type: String,
+            required: true
+        },
+        files: [{
+            type: mongoose.Schema.Types.ObjectId,
+            required: false
+        }]
+    }],
+    commits: [{
         type: mongoose.Schema.Types.ObjectId,
-        required: true
+        required: false
     }]
 });
-
 export default mongoose.model('Repository', repositorySchema);
