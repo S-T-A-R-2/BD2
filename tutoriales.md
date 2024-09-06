@@ -36,6 +36,8 @@ Muy probablemente no es así como se debería hacer, pero por lo menos logré cr
 
 ![TerceraCorrida](Imagenes/terceraCorrida.png)
 
+---
+
 # Nota
 Si algo les da error por alguna dependencia ejecuten de nuevo 
 ~~~
@@ -46,3 +48,10 @@ Agregué una dependencia nueva que es para cambiar de páginas o algo así, si l
 npm install react-router-dom
 ~~~
 [Información sobre react-router](https://reactrouter.com/en/main/components/link)
+
+# Tutorial git
+
+* Para hacer pull: git pull (nombre repositorio local) (nombre repositorio remoto) 
+* Para agragar cambios: git add -A 
+* Para commit: git commit -m "mensaje"
+* Para push: git push (nombre repo local) (ramaLocal):(ramaRemota)

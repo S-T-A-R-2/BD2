@@ -1,4 +1,5 @@
 import Repository from '../models/repository.model.js'
+import PrivateRepository from '../models/privateRepository.model.js'
 export const getRepositories = async (req, res) => {
     try {
         const repositories = await Repository.find();
@@ -13,14 +14,31 @@ export const getRepository = async (req, res) => {
     res.json(repository)
 };
 export const createRepository = async (req, res) => {
-    const {owner, name, files} = req.body
-    const newRepository = new Repository({
-        owner,
-        name,
-        files
-    });
-    const savedRepository = await newRepository.save();
-    res.json(savedRepository);
+    const {owner, name, description, branches, commits, isPrivate} = req.body
+    console.log(isPrivate);
+
+    if (isPrivate === "on") {
+        const newRepository = new PrivateRepository({
+            owner,
+            name,
+            description,
+            branches,
+            commits
+        });
+        console.log(newRepository);
+        const savedRepository = await newRepository.save();
+    } else {
+        const newRepository = new Repository({
+            owner,
+            name,
+            description,
+            branches,
+            commits
+        });
+        console.log(newRepository);
+        const savedRepository = await newRepository.save();
+    }
+    //res.json(savedRepository);
 };
 export const updateRepository = async (req, res) => {
     const repository = await Repository.findByIdAndUpdate(req.params.id, req.body, {
