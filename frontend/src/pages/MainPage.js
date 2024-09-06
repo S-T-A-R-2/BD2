@@ -19,7 +19,8 @@ export const MainPage = () => {
 			<br />
 			<TextField oldText = {password} onChange = {setPassword}/> <p>Pass: {password}</p>
 			<br />			
-			<label class="absolute inset top-0 right-0 text-black">
+
+      <label class="absolute inset top-0 right-0 text-black">
 				<span class="sr-only">Search</span>
 				<span class="absolute inset-y-0 left-0 flex items-center pl-2">
 					<svg class="h-5 w-5 fill-slate-300" viewBox="0 0 20 20"></svg>
@@ -27,11 +28,13 @@ export const MainPage = () => {
 				<input class="placeholder:italic placeholder:text-slate-400 block bg-white text-black w-full border border-slate-300 rounded-md py-2 pl-9 pr-3 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm" placeholder="Search for a repository..." type="text" name="search"/>
 			</label>
 			
+			
 			<div class="hide-sm hide-md mb-1 d-flex flex-justify-between flex-items-center">
-				<a href="/repositories" class="group block absolute w-30 h-25 left-0 text-black rounded-lg p-2 bg-white shadow-lg hover:bg-sky-500">					
-					<h3 class="flex space-x-3text-slate-900 group-hover:text-white text-sm font-semibold">📂New Repository</h3>	
+				<a href="/newRepository" class="group block absolute w-30 h-25 left-0 text-black rounded-lg p-2 bg-white shadow-lg hover:bg-sky-500">					
+					<h3 class="flex space-x-3text-slate-900 group-hover:text-white text-sm font-semibold">📂Nuevo Repositorio</h3>	
 				</a>
 			</div>
+
 			<br/>
 			<br/>
 			<div>

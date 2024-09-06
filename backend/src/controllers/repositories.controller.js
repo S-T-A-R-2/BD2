@@ -1,5 +1,6 @@
 import Repository from '../models/repository.model.js'
 import PrivateRepository from '../models/privateRepository.model.js'
+
 export const getRepositories = async (req, res) => {
     try {
         const repositories = await Repository.find();
@@ -14,7 +15,7 @@ export const getRepository = async (req, res) => {
     res.json(repository)
 };
 export const createRepository = async (req, res) => {
-    const {owner, name, description, branches, commits, isPrivate} = req.body
+    const {owner, name, description, branches, commits, isPrivate, tags} = req.body
 
     if (isPrivate) {
         const newRepository = new PrivateRepository({
@@ -22,7 +23,8 @@ export const createRepository = async (req, res) => {
             name,
             description,
             branches,
-            commits
+            commits,
+            tags
         });
         const savedRepository = await newRepository.save();
     } else {
@@ -31,7 +33,8 @@ export const createRepository = async (req, res) => {
             name,
             description,
             branches,
-            commits
+            commits,
+            tags
         });
         const savedRepository = await newRepository.save();
     }

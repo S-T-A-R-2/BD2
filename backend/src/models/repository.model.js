@@ -31,6 +31,10 @@ const repositorySchema = mongoose.Schema({
     commits: [{
         type: mongoose.Schema.Types.ObjectId,
         required: false
+    }],
+    tags: [{
+      type:String,
+      required: false
     }]
 });
 
