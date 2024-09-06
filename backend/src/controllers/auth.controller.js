@@ -5,18 +5,20 @@ import Encrypter from '../libs/encrypter.js'
 
 
 export const register = async (req, res) => {
-    const {email, password, username} = req.body;
+    const {email, password, name, username} = req.body;
     //User.create()
 
     //Encryption
     const encrypter = new Encrypter(process.env.ENCRYPT_KEY)
     const email_e = encrypter.encrypt(email);
     const password_e = encrypter.encrypt(password);
+    const name_e = encrypter.encrypt(name);
 
     try {
         const user = {
             email: email_e,
-            password: password_e
+            password: password_e,
+            name: name_e
         };
 
         const userJson = JSON.stringify(user);

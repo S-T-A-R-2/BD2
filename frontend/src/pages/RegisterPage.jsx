@@ -15,6 +15,9 @@ function RegisterPage() {
                 <input type="text" {...register("username", {required: true})}
                 className = "w-full bg-zinc-700 text-white px-4 py-2 rounded-md my-2"
                 placeholder='Username'/>
+                <input type="text" {...register("name", {required: true})}
+                className = "w-full bg-zinc-700 text-white px-4 py-2 rounded-md my-2"
+                placeholder='Name'/>      
                 <input type="email" {...register("email", {required: true})}
                 className = "w-full bg-zinc-700 text-white px-4 py-2 rounded-md my-2"
                 placeholder='Email'/>
@@ -22,7 +25,7 @@ function RegisterPage() {
                 className = "w-full bg-zinc-700 text-white px-4 py-2 rounded-md my-2"
                 placeholder='Password'/>
 
-                <button type="submit" className = "bg-white text-black px-4 py-2 rounded-md text-white my-2">Registrarse</button>
+                <button type="submit" className = "bg-white text-black px-4 py-2 rounded-md my-2">Registrarse</button>
             </form>
         </div>
     )
