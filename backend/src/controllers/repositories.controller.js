@@ -15,9 +15,8 @@ export const getRepository = async (req, res) => {
 };
 export const createRepository = async (req, res) => {
     const {owner, name, description, branches, commits, isPrivate} = req.body
-    console.log(isPrivate);
 
-    if (isPrivate === "on") {
+    if (isPrivate) {
         const newRepository = new PrivateRepository({
             owner,
             name,
@@ -25,7 +24,6 @@ export const createRepository = async (req, res) => {
             branches,
             commits
         });
-        console.log(newRepository);
         const savedRepository = await newRepository.save();
     } else {
         const newRepository = new Repository({
@@ -35,7 +33,6 @@ export const createRepository = async (req, res) => {
             branches,
             commits
         });
-        console.log(newRepository);
         const savedRepository = await newRepository.save();
     }
     //res.json(savedRepository);

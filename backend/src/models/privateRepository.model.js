@@ -21,7 +21,7 @@ const repositorySchema = mongoose.Schema({
         name: {
             type: String,
             required: true,
-            trim:  true,
+            trim: true,
         },
         files: [{
             type: mongoose.Schema.Types.ObjectId,

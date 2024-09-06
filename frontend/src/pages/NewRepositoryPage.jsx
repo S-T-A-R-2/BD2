@@ -41,7 +41,7 @@ function NewRepositoryPage() {
                 className = "w-full bg-zinc-700 text-white px-4 py-2 rounded-md my-2"
                 placeholder='description'/>
 
-                <input type="checkbox" onChange={e => setPrivate(e.target.value)}/> <p className='text-white inline'>Make Private</p>
+                <input type="checkbox" onChange={e => setPrivate(e.target.checked)}/> <p className='text-white inline'>Make Private</p>
 
                 <br />
 

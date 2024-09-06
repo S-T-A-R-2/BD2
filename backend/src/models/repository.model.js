@@ -20,7 +20,8 @@ const repositorySchema = mongoose.Schema({
     branches: [{
         name: {
             type: String,
-            required: true
+            required: true,
+            trim: true,
         },
         files: [{
             type: mongoose.Schema.Types.ObjectId,
@@ -32,4 +33,5 @@ const repositorySchema = mongoose.Schema({
         required: false
     }]
 });
+
 export default mongoose.model('Repository', repositorySchema);
