@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import { useLocation, useNavigate }  from 'react-router-dom';
+import { createFile } from '../api/auth.js'
 
 export const RepositoryPage = () => {
 	const navigate = useNavigate();
@@ -71,9 +72,9 @@ export const RepositoryPage = () => {
 	}
 
 	// Añadir archivo a la lista de archivos
-	const addFile = () => {
+	const addFile = async () => {
 		setFiles([...files, file]);
-		console.log(file);
+		await createFile(file.content, repository._id)
 	}
 
 	// descargar archivo
@@ -140,12 +141,14 @@ export const RepositoryPage = () => {
 						"/>
 					</label>
 				</form>
-				<button class="bg-sky-500 hover:bg-sky-700 text-2xl inline px-4 py-2 rounded-md my-2" onClick={downloadFile}> Descargar </button>
-				<button class="bg-sky-500 hover:bg-sky-700 text-2xl inline px-4 py-2 rounded-md my-2" onClick={addFile}> Aceptar </button>
+				<button class="bg-sky-500 hover:bg-sky-700 text-2xl inline px-4 py-2 rounded-md my-2" 
+						onClick={downloadFile}> Descargar </button>
+				<button class="bg-sky-500 hover:bg-sky-700 text-2xl inline px-4 py-2 rounded-md my-2" 
+						onClick={addFile}> Añadir archivo </button>
 
 			</div>
 			
-			<div class="relative right-80 max-w-md bg-zinc-800 p-10 rounded-md flex flex-col m-auto h-screen" justify-center>
+			<div class="relative max-w-md bg-zinc-800 p-10 rounded-md flex flex-col m-auto h-screen" justify-center>
 				<h1>Archivos</h1>
 				<FilesList/>
 			</div>

@@ -59,13 +59,3 @@ export const deleteRepository = async (req, res) => {
     if (!repository) return res.status(404).json({message: "Repository not found"})
     res.json(repository);
 };
-export const createFile = async (req, res) => {
-    //admin es el nombre de usuario y con123 la contraseña que hayan puesto
-    var nano = require('nano')('http://admin:con123@127.0.0.1:5984');
-    //test es el nombre de la base de datos
-    const db = nano.db.use('test');
-    var async = require('async');
-    const fs = require('fs');
-
-    db.insert(req);
-}
