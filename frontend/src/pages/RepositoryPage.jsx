@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import { useLocation, useNavigate }  from 'react-router-dom';
-import { createFile } from '../api/auth.js'
+import { createFile, getFiles } from '../api/auth.js'
 
 export const RepositoryPage = () => {
 	const navigate = useNavigate();
@@ -10,6 +10,7 @@ export const RepositoryPage = () => {
 	const [password, setPassword] = useState("");
 	const location = useLocation();
 	const [repository, setRepository] = useState(location.state ? location.state.repository : null);
+	const [loadFiles, setLoadFiles] = useState (true);
 	useEffect(() => {
 		
 		//const loggedIn = localStorage.getItem('loggedIn');
@@ -24,6 +25,13 @@ export const RepositoryPage = () => {
 			}
 		//}
 	}, []);
+
+	const updateFiles = async () => {
+		setFiles((await getFiles({repositoryId : repository._id})).data);
+		setLoadFiles(false);
+	}
+	if (loadFiles)
+		updateFiles();
 
 	const [contents, setContents] = useState(null);
 	const [filename, setFilename] = useState(null);
@@ -87,7 +95,7 @@ export const RepositoryPage = () => {
 	}
 	// Colocar lista de archivos en la interfaz
 	const FilesList = () => {
-		console.log(files)
+		//console.log(files)
 		return (
 		  <ul role="list" class="p-6 divide-y divide-slate-200 bg-white max-w-md text-black">
 			{files.map((file, index) => (
@@ -123,7 +131,8 @@ export const RepositoryPage = () => {
 				<h1>Añadir</h1>
 				
 				<button class="bg-sky-500 hover:bg-sky-700"
-					onClick={e => navigate(`/repository/${repository._id}/CreateFilePage`, {state: {repository : repository}})}>Añadir archivo
+					onClick={e => navigate(`/repository/${repository._id}/CreateFilePage`, {state: {repository : repository}})}>
+						Crear nuevo archivo
 				</button>
 
 				

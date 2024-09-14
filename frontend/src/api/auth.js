@@ -15,5 +15,7 @@ export const getRepositories = (repository) => axios.get(`/repositories`, {
     params: repository
   });
 export const createFile = (file, repositoryId) => axios.post(`/repositories/${repositoryId}/create`, file);
-
+export const getFiles = (repositoryId) => axios.get(`/repositories/${repositoryId.repositoryId}/create`, {
+    params: repositoryId
+  });
 //export const getReposi
