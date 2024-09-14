@@ -7,6 +7,8 @@ import cookieParser from 'cookie-parser'
 import cors from 'cors';
 import {connectDB} from './db.js'
 connectDB();
+
+
 const app = express();
 //app.use(morgan("dev"));
 app.use(cors({
