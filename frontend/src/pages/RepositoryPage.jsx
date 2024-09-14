@@ -74,7 +74,11 @@ export const RepositoryPage = () => {
 	// Añadir archivo a la lista de archivos
 	const addFile = async () => {
 		setFiles([...files, file]);
-		await createFile(file.content, repository._id)
+		const newFile = {
+			_id : file.name,
+			content : file.content
+		};
+		await createFile(newFile, repository._id);
 	}
 
 	// descargar archivo
