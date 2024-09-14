@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react'
 import { useLocation, useNavigate }  from 'react-router-dom';
 import { createFile, getFiles } from '../api/auth.js';
-
+import { Dropdown, FileBrowser } from '../components/Dropdown.js';
 
 export const RepositoryPage = () => {
 	const navigate = useNavigate();
@@ -12,14 +12,6 @@ export const RepositoryPage = () => {
 	const location = useLocation();
 	const [repository, setRepository] = useState(location.state ? location.state.repository : null);
 	const [loadFiles, setLoadFiles] = useState (true);
-	
-	
-	// Para mostrar el menú desplegable
-	const [isOpen, setIsOpen] = useState(false);
-	const toggleMenu = () => {
-		setIsOpen(!isOpen);
-	};
-
 	
 	useEffect(() => {
 		
@@ -106,8 +98,8 @@ export const RepositoryPage = () => {
 	// Colocar lista de archivos en la interfaz
 	const FilesList = () => {
 		return (
-		<div class="relative scroll-pb-6 size-[500px]">
-		  <ul role="list" class="p-6 divide-y divide-slate-100 bg-white text-black">
+			<div class="relative scroll-pb-6 size-[500px]">
+		  	<ul role="list" class="p-6 divide-y divide-slate-100 bg-white text-black">
 			{files.map((file, index) => (
 			  <li class="group/item flex py-4 first:pt-0 last:pb-0">
 				<div className="w-full cursor-pointer">
@@ -118,62 +110,21 @@ export const RepositoryPage = () => {
 				</a>
 			  </li>
 			))}
-		  </ul>
-		</div>
-		)
-	  }
-
-
-	const MenuOptions = () => {
-		return (
-			<div className="absolute mt-2 w-[200px] rounded-md shadow-lg">
-			<ul className="py-1">
-				<li>
-					<button 
-						class="bg-sky-500 hover:bg-sky-700 text-40 inline px-4 py-2 rounded-md my-2"
-						onClick={e => navigate(`/repository/${repository._id}/CreateFilePage`, {state: {repository : repository}})}>
-						Crear nuevo archivo
-					</button>
-				</li>
-				<li>
-					<button 
-						class="bg-sky-500 hover:bg-sky-700 text-40 inline px-4 py-2 rounded-md my-2" 
-						onClick={addFile}>
-						Añadir archivo 
-					</button>
-				</li>
-				<li>
-					<button 
-						class="bg-sky-500 hover:bg-sky-700 text-40 inline px-4 py-2 rounded-md my-2" 
-						onClick={downloadFile}> 
-						Descargar 
-					</button>
-				</li>
-			</ul>
-		</div>
-		)
-	  }
-
-	const FileBrowser = () => {
-		return (
-			<form class="flex items-center space-x-6">
-				<div class="shrink-0">
-					<img class="h-16 w-16 object-cover rounded-full" src="https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1361&q=80" alt="Current profile photo" />
-				</div>
-				<label class="block">
-					<span class="sr-only">Choose profile photo</span>
-					<input type="file" onChange={e => filess(e.target.files)}
-					class="block w-full text-sm text-slate-500
-					file:mr-4 file:py-2 file:px-4
-					file:rounded-full file:border-0
-					file:text-sm file:font-semibold
-					file:bg-violet-50 file:text-violet-700
-					hover:file:bg-violet-100
-					"/>
-				</label>
-			</form>
+		  	</ul>
+			</div>
 		)
 	}
+
+	// Para mostrar el menú desplegable
+	const [isOpen, setIsOpen] = useState(false);
+	const toggleMenu = () => {
+		setIsOpen(!isOpen);
+	};
+	const menuOptions = [
+		{ label: 'Crear nuevo archivo', link: '#', onClick: () => navigate(`/repository/${repository._id}/CreateFilePage`, {state: {repository : repository}}) },
+		{ label: 'Añadir archivo', link: '#', onClick: () => addFile()},
+		{ label: 'Descargar', link: '#', onClick: () =>  downloadFile()}
+	];
 	// Interfaz
 	return (
 		<div className='relative text-white bg-zinc-800 flex flex-col m-auto h-screen'>
@@ -185,31 +136,10 @@ export const RepositoryPage = () => {
 			<h1 class="text-[40px]">{repository.name}</h1>
 			<p class="text-[20px]">Rama actual: Master</p>
 			<h2>Usuario: {username}</h2>
-            
-
-			<div class="relative top-[120px]">
-				<button onClick={toggleMenu}
-        		className="inline-flex px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none"
-      			>
-					Opciones
-					<svg
-					className={`w-5 h-5 ml-2 transform ${isOpen ? "rotate-180" : "rotate-0"}`}
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-					>
-						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-					</svg>
-      			</button>
-				{isOpen && (
-					<MenuOptions/>
-				)}
-			</div>
-			
+            <Dropdown buttonText="Opciones" action={toggleMenu} isActive={isOpen} options={menuOptions}/>
 
 			<div class="relative">
-				<FileBrowser/>
+				<FileBrowser action={filess} label="Selecciona el archivo"/>
 			</div>
 			<div class="relative bg-zinc-800 bottom-[80px] rounded-md flex flex-col m-auto">
 				<h1>Archivos</h1>
