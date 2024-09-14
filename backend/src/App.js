@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import repositoriesRoutes from "./routes/repository.route.js"
 import authRoutes from './routes/auth.route.js'
+import filesRoutes from './routes/file.route.js'
 import cookieParser from 'cookie-parser'
 
 import cors from 'cors';
@@ -22,6 +23,7 @@ app.use(cookieParser());
 
 app.use("/api", repositoriesRoutes);
 app.use("/api", authRoutes);
+app.use("/api", filesRoutes);
 app.get("/", (req, resp) => {
 
     resp.send("App is Working");

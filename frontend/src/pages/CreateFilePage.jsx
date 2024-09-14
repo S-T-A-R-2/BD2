@@ -72,7 +72,7 @@ export const CreateFilePage = () => {
 			_id : fileName,
 			content: editorRef.current.getValue()
 		};
-		createFile(fileObject);
+		createFile(fileObject, repository._id);
 		
 	}
 
@@ -114,9 +114,14 @@ export const CreateFilePage = () => {
 		)
 	  }
 
+/*<div class="relative bg-zinc-800 rounded-md flex flex-col m-auto" justify-center>
+					<h1>Archivos</h1>
+					<FilesList/>
+				</div>	*/
+
 	// Interfaz
 	return (
-		<div className='text-white bg-zinc-800 flex  flex-col m-auto h-screen'>
+		<div className='text-white bg-zinc-800 m-auto h-screen'>
 			<h1>Ver repositorio</h1>
 			<h2>Usuario: {username}</h2>
             <div class="absolute top-0 right-0 ide-sm hide-md mb-1 d-flex flex-justify-between flex-items-center">
@@ -134,38 +139,22 @@ export const CreateFilePage = () => {
 					</a>
 				</button>
 
+			
+
+
+
 				
-
-
-				<form class="flex items-center space-x-6">
-					<div class="shrink-0">
-						<img class="h-16 w-16 object-cover rounded-full" src="https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1361&q=80" alt="Current profile photo" />
-					</div>
-					<label class="block">
-						<span class="sr-only">Choose profile photo</span>
-						<input type="file" onChange={e => filess(e.target.files)}
-						class="block w-full text-sm text-slate-500
-						file:mr-4 file:py-2 file:px-4
-						file:rounded-full file:border-0
-						file:text-sm file:font-semibold
-						file:bg-violet-50 file:text-violet-700
-						hover:file:bg-violet-100
-						"/>
-					</label>
-				</form>
 				<button class="bg-sky-500 hover:bg-sky-700 text-2xl inline px-4 py-2 rounded-md my-2" onClick={downloadFile}> Descargar </button>
 				<button class="bg-sky-500 hover:bg-sky-700 text-2xl inline px-4 py-2 rounded-md my-2" onClick={addFile}> Aceptar </button>
-				<div minH="100vh" bg="#0fa19" color ="gray.500" px={6} py={8}>
+				
+				<div class="m-auto w-[700px] h-[500px] relative left-30" bg="#0fa19" color ="gray.500">
 					<label>File name: </label>
 					<input type="text" value={fileName} onChange= {(e) => setFileName(e.target.value)}  style={{ color:'black' }}/>
-					<Editor height="90vh" defaultLanguage="javascript" defaultvalue="//some comment" onMount={saveEditorText}/>
+					<Editor height="80vh" defaultLanguage="javascript" defaultvalue="//some comment" onMount={saveEditorText}/>
 				</div>
+
 			</div>
 			
-			<div class="relative right-80 max-w-md bg-zinc-800 p-10 rounded-md flex flex-col m-auto h-screen" justify-center>
-				<h1>Archivos</h1>
-				<FilesList/>
-			</div>
 	  </div>
 	);
 }

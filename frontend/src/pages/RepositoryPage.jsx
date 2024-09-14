@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import { useLocation, useNavigate }  from 'react-router-dom';
+import { createFile, getFiles } from '../api/auth.js'
 
 export const RepositoryPage = () => {
 	const navigate = useNavigate();
@@ -9,6 +10,7 @@ export const RepositoryPage = () => {
 	const [password, setPassword] = useState("");
 	const location = useLocation();
 	const [repository, setRepository] = useState(location.state ? location.state.repository : null);
+	const [loadFiles, setLoadFiles] = useState (true);
 	useEffect(() => {
 		
 		//const loggedIn = localStorage.getItem('loggedIn');
@@ -23,6 +25,13 @@ export const RepositoryPage = () => {
 			}
 		//}
 	}, []);
+
+	const updateFiles = async () => {
+		setFiles((await getFiles({repositoryId : repository._id})).data);
+		setLoadFiles(false);
+	}
+	if (loadFiles)
+		updateFiles();
 
 	const [contents, setContents] = useState(null);
 	const [filename, setFilename] = useState(null);
@@ -71,9 +80,13 @@ export const RepositoryPage = () => {
 	}
 
 	// Añadir archivo a la lista de archivos
-	const addFile = () => {
+	const addFile = async () => {
 		setFiles([...files, file]);
-		console.log(file);
+		const newFile = {
+			_id : file.name,
+			content : file.content
+		};
+		await createFile(newFile, repository._id);
 	}
 
 	// descargar archivo
@@ -82,7 +95,7 @@ export const RepositoryPage = () => {
 	}
 	// Colocar lista de archivos en la interfaz
 	const FilesList = () => {
-		console.log(files)
+		//console.log(files)
 		return (
 		  <ul role="list" class="p-6 divide-y divide-slate-200 bg-white max-w-md text-black">
 			{files.map((file, index) => (
@@ -118,7 +131,8 @@ export const RepositoryPage = () => {
 				<h1>Añadir</h1>
 				
 				<button class="bg-sky-500 hover:bg-sky-700"
-					onClick={e => navigate(`/repository/${repository._id}/CreateFilePage`, {state: {repository : repository}})}>Añadir archivo
+					onClick={e => navigate(`/repository/${repository._id}/CreateFilePage`, {state: {repository : repository}})}>
+						Crear nuevo archivo
 				</button>
 
 				
@@ -140,12 +154,14 @@ export const RepositoryPage = () => {
 						"/>
 					</label>
 				</form>
-				<button class="bg-sky-500 hover:bg-sky-700 text-2xl inline px-4 py-2 rounded-md my-2" onClick={downloadFile}> Descargar </button>
-				<button class="bg-sky-500 hover:bg-sky-700 text-2xl inline px-4 py-2 rounded-md my-2" onClick={addFile}> Aceptar </button>
+				<button class="bg-sky-500 hover:bg-sky-700 text-2xl inline px-4 py-2 rounded-md my-2" 
+						onClick={downloadFile}> Descargar </button>
+				<button class="bg-sky-500 hover:bg-sky-700 text-2xl inline px-4 py-2 rounded-md my-2" 
+						onClick={addFile}> Añadir archivo </button>
 
 			</div>
 			
-			<div class="relative right-80 max-w-md bg-zinc-800 p-10 rounded-md flex flex-col m-auto h-screen" justify-center>
+			<div class="relative max-w-md bg-zinc-800 p-10 rounded-md flex flex-col m-auto h-screen" justify-center>
 				<h1>Archivos</h1>
 				<FilesList/>
 			</div>
