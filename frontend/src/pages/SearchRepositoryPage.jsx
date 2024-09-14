@@ -30,6 +30,7 @@ function SearchRepositoryPage() {
   const RepositoriesList = () => {
     if (repositories) {
       return (
+        <div class="scroll-pb-6">
         <ul role="list" class="p-6 divide-y divide-slate-200 bg-white max-w-md">
           {repositories.map((repository, index) => (
             <li key={repository._id} class="group/item flex py-4 first:pt-0 last:pb-0">
@@ -42,6 +43,7 @@ function SearchRepositoryPage() {
             </li>
           ))}
         </ul>
+        </div>
       )
     }
   }
