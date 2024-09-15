@@ -1,6 +1,6 @@
 export function Dropdown({buttonText, action, isActive, options}){
     return (
-        <div class="relative top-[120px]">
+        <div>
             <button onClick={action}
             className="inline-flex px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none"
             >

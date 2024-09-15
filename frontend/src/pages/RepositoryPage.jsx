@@ -127,7 +127,8 @@ export const RepositoryPage = () => {
 	const menuOptions = [
 		{ label: 'Crear nuevo archivo', link: '#', onClick: () => navigate(`/repository/${repository._id}/CreateFilePage`, {state: {repository : repository}}) },
 		{ label: 'Añadir archivo', link: '#', onClick: () => addFilesA()},
-		{ label: 'Descargar', link: '#', onClick: () =>  downloadFile()}
+		{ label: 'Descargar', link: '#', onClick: () =>  downloadFile()},
+		{ label: 'Crear nueva rama', onClick: () => createNewBranch()}
 	];
 
 	const [isOpenBranchMenu, setIsOpenBranchMenu] = useState(false);
@@ -164,6 +165,7 @@ export const RepositoryPage = () => {
 	}
 
 	// Interfaz
+	const mergeText = `merge ${branch.name} to master`
 	return (
 		<div className='relative text-white bg-zinc-800 flex flex-col m-auto h-screen'>
 			<div class="absolute top-0 right-0 ide-sm hide-md mb-1 d-flex flex-justify-between flex-items-center">
@@ -171,25 +173,25 @@ export const RepositoryPage = () => {
 					<h3 class="flex space-x-3text-slate-900 group-hover:text-white text-sm font-semibold">🏠 Volver a Página Principal</h3>	
 				</a>
 			</div>
-			<h1 class="text-[40px]">{repository.name}</h1>
-			<p class="text-[20px]">Rama actual: {branch.name}</p>
-			<h2>Usuario: {username}</h2>
-            
-			<div className = "relative flex flex-row">
+			<div>
+				<h1 class="text-[40px]">{repository.name}</h1>
+				<p class="text-[20px]">Rama actual: {branch.name}</p>
+				<h2>Usuario: {username}</h2>
+				<p>{repository.description}</p>
+            </div>
+
+			<div className = "relative top-[100px] flex flex-row">
 				<Dropdown buttonText="Opciones" action={toggleMenu} isActive={isOpen} options={menuOptions}/>
 				<Dropdown buttonText="Ramas" action={toggleBranchMenu} isActive={isOpenBranchMenu} options={menuBranchOptions}/>
+				<div className='flex'>
+					<Button text="historial de commits" onClick={e => console.log("Hola")}/>
+					<Button text={mergeText} onClick={e => console.log("Hola")}/>					
+					<input type="text" className='text-black' placeholder='Mensaje de commit'/>
+				</div>
 			</div>
 			
-			<div className='relative m-auto'>
-				<p>Sección de commits</p>
-				<Button text="Crear nueva rama" onClick={createNewBranch}/>
-				
-				<form>
-					<input type="text" className='text-black' placeholder='Mensaje de commit'/>
-					<Button text="commit" onClick={e => console.log("Hola")}/>
-				</form>
-			</div>
-			<div class="relative bg-zinc-800 bottom-[80px] rounded-md flex flex-row m-auto">
+			
+			<div class="relative bg-zinc-800 left-[50px] rounded-md flex flex-row m-auto">
 				<div class="relative bg-zinc-800 rounded-md flex flex-col m-auto">
 					<h1>Archivos</h1>
 					<FilesList/>
