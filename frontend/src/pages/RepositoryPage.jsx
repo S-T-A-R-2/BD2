@@ -13,22 +13,19 @@ export const RepositoryPage = () => {
 	const [branches, setBranches] = useState(null);
 	const [repository, setRepository] = useState(location.state ? location.state.repository : null);
 	const [loadFiles, setLoadFiles] = useState (true);
-	
-	useEffect(() => {
-		
-		//const loggedIn = localStorage.getItem('loggedIn');
-		//if (loggedIn === 'true') {
-		
-			// Recuperar el nombre de usuario del login	
-			const storedUsername = localStorage.getItem('user');
-			if (storedUsername) {
-				setUsername(JSON.parse(storedUsername));
-				console.log('Username:', JSON.parse(storedUsername));
-				localStorage.removeItem('loggedIn');
-			}
-		//}
-	}, []);
+	const [branch, setBranch] = useState("");
+	const [menuBranchOptions, setMenuBranchOption] = useState([]);
+	const [actualBranch, setActualBranch] = useState(0);
 
+	useEffect(() => {
+		// Recuperar el nombre de usuario del login	
+		const storedUsername = localStorage.getItem('user');
+		if (storedUsername) {
+			setUsername(JSON.parse(storedUsername));
+			console.log('Username:', JSON.parse(storedUsername));
+			localStorage.removeItem('loggedIn');
+		}
+	}, []);
 	useEffect(() => {
 		const getBranchesAux = async () => {
 			if (repository) {
@@ -36,16 +33,15 @@ export const RepositoryPage = () => {
 			}
 		}
 		getBranchesAux();
-	}, [repository])
-
+	}, [repository]);
 	useEffect(() => {
 		if (branches) {
-			setFiles(branches[0].files);
+			const current = branches[actualBranch];
+			setBranch(current);
+			setFiles(current.files);
+			updateMenuBranches();
 		}
-
-	}, [branches])
-
-
+	}, [branches, actualBranch]);
 	const [contents, setContents] = useState(null);
 	const [filename, setFilename] = useState(null);
 	const reader = new FileReader();
@@ -54,7 +50,6 @@ export const RepositoryPage = () => {
 	reader.onload = async () => {
 		setContents(reader.result);
 	}
-
 	// Actualizar el archivo cuando el contenido es actualizado
 	useEffect(() => {
 		if (contents){
@@ -75,8 +70,6 @@ export const RepositoryPage = () => {
 	  
 		document.body.removeChild(element);
 	}
-
-
 	// Leer archivos cargador por el usuario
 	const filess = (value) => {
 		console.log(typeof value);
@@ -91,7 +84,6 @@ export const RepositoryPage = () => {
 		//SaveFile(filename, contents)
 		console.log(file);
 	}
-
 	// Añadir archivo a la lista de archivos
 	const addFile = async () => {
 		setFiles([...files, file]);
@@ -101,7 +93,6 @@ export const RepositoryPage = () => {
 		};
 		await createFile(newFile, repository._id);
 	}
-
 	// descargar archivo
 	const downloadFile = (file, content) => {
 		download(file, content);
@@ -142,13 +133,34 @@ export const RepositoryPage = () => {
 	const toggleBranchMenu = () => {
 		setIsOpenBranchMenu(!isOpenBranchMenu);
 	};
-	const hola = () => {
-		<button>hola</button>
+	
+	function updateMenuBranches(){
+		const options = branches.map((branch, index) => ({
+			label: branch.name,
+			onClick: () => setActualBranch(index)
+		}));
+		setMenuBranchOption(options);
 	}
-	const menuBranchOptions = [
-		{ label: 'Master', link: '#', onClick: () => navigate(`/repository/${repository._id}/CreateFilePage`, {state: {repository : repository}}) },
-		{ label: 'Segunda', link: '#', onClick: () => addFile()}
-	];
+	const createNewBranch = () => {
+		const newBranch = {
+			name: "nueva rama",
+			files: [
+			  {
+				filename: "NuevaRama.md",
+				content: "Soy un readme",
+				comments: [
+				  {
+					userId: "567",
+					date: "13-09-2024",
+					description: "Soy un comentario"
+				  }
+				]
+			  }
+			]
+		}
+		setBranches([...branches, newBranch]);
+	}
+
 	// Interfaz
 	return (
 		<div className='relative text-white bg-zinc-800 flex flex-col m-auto h-screen'>
@@ -158,16 +170,14 @@ export const RepositoryPage = () => {
 				</a>
 			</div>
 			<h1 class="text-[40px]">{repository.name}</h1>
-			<p class="text-[20px]">Rama actual: Master</p>
+			<p class="text-[20px]">Rama actual: {branch.name}</p>
 			<h2>Usuario: {username}</h2>
             
-			
-			
-
 			<div className = "relative flex flex-row bottom-[50px]">
 			<Dropdown buttonText="Opciones" action={toggleMenu} isActive={isOpen} options={menuOptions}/>
 			<Dropdown buttonText="Ramas" action={toggleBranchMenu} isActive={isOpenBranchMenu} options={menuBranchOptions}/>
-			<button className="inline-flex px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none">
+			<button className="inline-flex px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none"
+					onClick={e => createNewBranch()}>
 				Crear nueva rama
 			</button>
 			</div>
