@@ -1,6 +1,6 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {useForm} from 'react-hook-form'
-import { createRepository } from '../api/auth';
+import { createRepository, createBranches, getRepository } from '../api/auth';
 import {TagsInput}  from 'react-tag-input-component';
 import '../reactTags.css';
 function NewRepositoryPage() {
@@ -9,11 +9,11 @@ function NewRepositoryPage() {
     const [descriptionR, setDescription] = useState("description");
     const [privateR, setPrivate] = useState(false);
     const [tagsR, setTags] = useState([]);
-    //const tagsRT = tagsR.split(" ");
     
     const createRepositoryAux = async () => {
+        const owner = "Gerald";
         const rep = {
-            owner: "Gerald",
+            owner: owner,
             name: nameR,
             description: descriptionR,
             branches: [{
@@ -24,7 +24,36 @@ function NewRepositoryPage() {
             commits: [],
             isPrivate: privateR
         };
-        await createRepository(rep);
+        
+        try {
+            await createRepository(rep);
+            const response = await getRepository({ owner: "Gerald", name: nameR });
+            const Branch = {
+                _id: response.data[0]._id.toString(),
+                branches: [
+                  {
+                    name: "master",
+                    files: [
+                      {
+                        filename: "Readme.md",
+                        content: "Soy un readme",
+                        comments: [
+                          {
+                            userId: "567",
+                            date: "13-09-2024",
+                            description: "Soy un comentario"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+            };
+            await createBranches(Branch, response.data._id);
+            console.log(response.data);
+        } catch (error) {
+            console.error('Error:', error);
+        }
     }
 
     return (

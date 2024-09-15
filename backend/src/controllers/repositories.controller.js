@@ -34,6 +34,7 @@ export const createRepository = async (req, res) => {
             tags
         });
         const savedRepository = await newRepository.save();
+        res.json(savedRepository);
     } else {
         const newRepository = new Repository({
             owner,
@@ -44,8 +45,9 @@ export const createRepository = async (req, res) => {
             tags
         });
         const savedRepository = await newRepository.save();
+        res.json(savedRepository);
     }
-    //res.json(savedRepository);
+    
 };
 export const updateRepository = async (req, res) => {
     const repository = await Repository.findByIdAndUpdate(req.params.id, req.body, {

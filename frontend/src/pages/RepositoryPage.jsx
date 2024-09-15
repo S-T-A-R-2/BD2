@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import { useLocation, useNavigate }  from 'react-router-dom';
-import { createFile, getFiles } from '../api/auth.js';
+import { createFile, getFiles, getBranches } from '../api/auth.js';
 import { Dropdown, FileBrowser } from '../components/Dropdown.js';
 
 export const RepositoryPage = () => {
@@ -10,6 +10,7 @@ export const RepositoryPage = () => {
 	const [files, setFiles] = useState([]);
 	const [password, setPassword] = useState("");
 	const location = useLocation();
+	const [branches, setBranches] = useState(null);
 	const [repository, setRepository] = useState(location.state ? location.state.repository : null);
 	const [loadFiles, setLoadFiles] = useState (true);
 	
@@ -28,12 +29,22 @@ export const RepositoryPage = () => {
 		//}
 	}, []);
 
-	const updateFiles = async () => {
-		setFiles((await getFiles({repositoryId : repository._id})).data);
-		setLoadFiles(false);
-	}
-	if (loadFiles)
-		updateFiles();
+	useEffect(() => {
+		const getBranchesAux = async () => {
+			if (repository) {
+				setBranches((await getBranches({repositoryId : repository._id})).data[0].branches);
+			}
+		}
+		getBranchesAux();
+	}, [repository])
+
+	useEffect(() => {
+		if (branches) {
+			setFiles(branches[0].files);
+		}
+
+	}, [branches])
+
 
 	const [contents, setContents] = useState(null);
 	const [filename, setFilename] = useState(null);
@@ -103,7 +114,7 @@ export const RepositoryPage = () => {
 			{files.map((file, index) => (
 			  <li class="group/item flex py-4 first:pt-0 last:pb-0">
 				<div className="w-full cursor-pointer">
-				  	<p class="text-sm font-medium text-slate-900">📂 {file.name}</p>
+				  	<p class="text-sm font-medium text-slate-900">📂 {file.filename}</p>
 				</div>
 				<a class="group/edit invisible hover:bg-slate-200 group-hover/item:visible" onClick={e => downloadFile(file.name, file.content)}>
 					<button>Descargar</button>
@@ -120,10 +131,23 @@ export const RepositoryPage = () => {
 	const toggleMenu = () => {
 		setIsOpen(!isOpen);
 	};
+	
 	const menuOptions = [
 		{ label: 'Crear nuevo archivo', link: '#', onClick: () => navigate(`/repository/${repository._id}/CreateFilePage`, {state: {repository : repository}}) },
 		{ label: 'Añadir archivo', link: '#', onClick: () => addFile()},
 		{ label: 'Descargar', link: '#', onClick: () =>  downloadFile()}
+	];
+
+	const [isOpenBranchMenu, setIsOpenBranchMenu] = useState(false);
+	const toggleBranchMenu = () => {
+		setIsOpenBranchMenu(!isOpenBranchMenu);
+	};
+	const hola = () => {
+		<button>hola</button>
+	}
+	const menuBranchOptions = [
+		{ label: 'Master', link: '#', onClick: () => navigate(`/repository/${repository._id}/CreateFilePage`, {state: {repository : repository}}) },
+		{ label: 'Segunda', link: '#', onClick: () => addFile()}
 	];
 	// Interfaz
 	return (
@@ -136,11 +160,24 @@ export const RepositoryPage = () => {
 			<h1 class="text-[40px]">{repository.name}</h1>
 			<p class="text-[20px]">Rama actual: Master</p>
 			<h2>Usuario: {username}</h2>
-            <Dropdown buttonText="Opciones" action={toggleMenu} isActive={isOpen} options={menuOptions}/>
+            
+			
+			
 
-			<div class="relative">
-				<FileBrowser action={filess} label="Selecciona el archivo"/>
+			<div className = "relative flex flex-row bottom-[50px]">
+			<Dropdown buttonText="Opciones" action={toggleMenu} isActive={isOpen} options={menuOptions}/>
+			<Dropdown buttonText="Ramas" action={toggleBranchMenu} isActive={isOpenBranchMenu} options={menuBranchOptions}/>
+			<button className="inline-flex px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none">
+				Crear nueva rama
+			</button>
 			</div>
+			
+			<div>
+				<div className="relative bottom-[50px]">
+					<FileBrowser action={filess} label="Selecciona el archivo"/>
+				</div>
+			</div>
+
 			<div class="relative bg-zinc-800 bottom-[80px] rounded-md flex flex-col m-auto">
 				<h1>Archivos</h1>
 				<FilesList/>
