@@ -1,22 +1,23 @@
 import React, {useState, useEffect} from 'react'
 import { useLocation, useNavigate }  from 'react-router-dom';
 import { createFile, getFiles, getBranches } from '../api/auth.js';
-import { Dropdown, FileBrowser } from '../components/Dropdown.js';
+import { Dropdown, FileBrowser, Button } from '../components/Dropdown.js';
 
 export const RepositoryPage = () => {
 	const navigate = useNavigate();
 	const [username, setUsername] = useState(null);
-	const [file, setFile] = useState({name : "", content : ""});
 	const [files, setFiles] = useState([]);
 	const location = useLocation();
 	const [branches, setBranches] = useState(null);
-	const [repository, setRepository] = useState(location.state ? location.state.repository : null);
-	const [loadFiles, setLoadFiles] = useState (true);
+	const [repository, setRepository] = useState(() => {
+        const savedRepository = localStorage.getItem('repository');
+        console.log(savedRepository);
+        return savedRepository ? JSON.parse(savedRepository) : null;
+    });
 	const [branch, setBranch] = useState("");
 	const [menuBranchOptions, setMenuBranchOption] = useState([]);
 	const [actualBranch, setActualBranch] = useState(0);
 	const [currentFile, setCurrentFile] = useState(0);
-
 	useEffect(() => {
 		// Recuperar el nombre de usuario del login	
 		const storedUsername = localStorage.getItem('user');
@@ -29,7 +30,8 @@ export const RepositoryPage = () => {
 	useEffect(() => {
 		const getBranchesAux = async () => {
 			if (repository) {
-				setBranches((await getBranches({repositoryId : repository._id})).data[0].branches);
+				const dataT = (await getBranches({repositoryId : repository._id})).data[0];
+				setBranches(dataT.branches);
 			}
 		}
 		getBranchesAux();
@@ -42,21 +44,6 @@ export const RepositoryPage = () => {
 			updateMenuBranches();
 		}
 	}, [branches, actualBranch]);
-	const [contents, setContents] = useState(null);
-	const [filename, setFilename] = useState(null);
-	const reader = new FileReader();
-
-	// Actualizar el contenido del archivo
-	reader.onload = async () => {
-		setContents(reader.result);
-	}
-	// Actualizar el archivo cuando el contenido es actualizado
-	useEffect(() => {
-		if (contents){
-			setFile({name : filename, content: contents})
-		}
-	}, [contents]);
-
 	// Descargar archivos
 	function download(filename, text) {
 		var element = document.createElement('a');
@@ -70,29 +57,7 @@ export const RepositoryPage = () => {
 	  
 		document.body.removeChild(element);
 	}
-	// Leer archivos cargador por el usuario
-	const filess = (value) => {
-		console.log(typeof value);
-		setFilename(value[0].name)
-		reader.readAsText(value[0]);
-		//setContents(reader.result);
-		
-	}
-	// Guardar archivos en la base de datos
-	const saveFile = () => {
-		// Llamar a la base de datos
-		//SaveFile(filename, contents)
-		console.log(file);
-	}
-	// Añadir archivo a la lista de archivos
-	const addFile = async () => {
-		setFiles([...files, file]);
-		const newFile = {
-			_id : file.name,
-			content : file.content
-		};
-		await createFile(newFile, repository._id);
-	}
+	
 	// descargar archivo
 	const downloadFile = (file, content) => {
 		download(file, content);
@@ -153,9 +118,15 @@ export const RepositoryPage = () => {
 		setIsOpen(!isOpen);
 	};
 	
+	const addFilesA = () => {
+		localStorage.setItem('currentBranch', JSON.stringify(actualBranch));
+		localStorage.setItem('repositoryId', JSON.stringify(repository._id));
+		navigate(`/repository/${repository._id}/AddFilePage`);
+	}
+
 	const menuOptions = [
 		{ label: 'Crear nuevo archivo', link: '#', onClick: () => navigate(`/repository/${repository._id}/CreateFilePage`, {state: {repository : repository}}) },
-		{ label: 'Añadir archivo', link: '#', onClick: () => addFile()},
+		{ label: 'Añadir archivo', link: '#', onClick: () => addFilesA()},
 		{ label: 'Descargar', link: '#', onClick: () =>  downloadFile()}
 	];
 
@@ -188,6 +159,7 @@ export const RepositoryPage = () => {
 			  }
 			]
 		}
+		console.log("Holaaaa")
 		setBranches([...branches, newBranch]);
 	}
 
@@ -203,21 +175,20 @@ export const RepositoryPage = () => {
 			<p class="text-[20px]">Rama actual: {branch.name}</p>
 			<h2>Usuario: {username}</h2>
             
-			<div className = "relative flex flex-row bottom-[50px]">
-			<Dropdown buttonText="Opciones" action={toggleMenu} isActive={isOpen} options={menuOptions}/>
-			<Dropdown buttonText="Ramas" action={toggleBranchMenu} isActive={isOpenBranchMenu} options={menuBranchOptions}/>
-			<button className="inline-flex px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none"
-					onClick={e => createNewBranch()}>
-				Crear nueva rama
-			</button>
+			<div className = "relative flex flex-row">
+				<Dropdown buttonText="Opciones" action={toggleMenu} isActive={isOpen} options={menuOptions}/>
+				<Dropdown buttonText="Ramas" action={toggleBranchMenu} isActive={isOpenBranchMenu} options={menuBranchOptions}/>
 			</div>
 			
-			<div>
-				<div className="relative bottom-[50px]">
-					<FileBrowser action={filess} label="Selecciona el archivo"/>
-				</div>
+			<div className='relative m-auto'>
+				<p>Sección de commits</p>
+				<Button text="Crear nueva rama" onClick={createNewBranch}/>
+				
+				<form>
+					<input type="text" className='text-black' placeholder='Mensaje de commit'/>
+					<Button text="commit" onClick={e => console.log("Hola")}/>
+				</form>
 			</div>
-
 			<div class="relative bg-zinc-800 bottom-[80px] rounded-md flex flex-row m-auto">
 				<div class="relative bg-zinc-800 rounded-md flex flex-col m-auto">
 					<h1>Archivos</h1>

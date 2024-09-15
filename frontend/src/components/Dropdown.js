@@ -53,3 +53,17 @@ export function FileBrowser({action, label}){
         </form>
     )
 }
+
+export function Button({onClick, text, args = []}){
+    if (args.length === 0){
+      return (
+        <button className="inline-flex px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none"
+        onClick={() => onClick(...args)}>{text}</button>
+      );
+    } else {
+      return (
+        <button className="inline-flex px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none"
+            onClick={() => onClick(...args)}>{text}</button>
+      );
+    }
+}

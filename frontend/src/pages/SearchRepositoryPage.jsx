@@ -26,6 +26,13 @@ function SearchRepositoryPage() {
     }
     setLoading(false);
   }
+
+  const viewRepository = (repository) => {
+    localStorage.setItem('repository', JSON.stringify(repository));
+    navigate(`/repository/${repository._id}`, {
+      state: { repository: repository }
+      })
+  }
   
   const RepositoriesList = () => {
     if (repositories) {
@@ -34,9 +41,7 @@ function SearchRepositoryPage() {
         <ul role="list" class="p-6 divide-y divide-slate-200 bg-white max-w-md">
           {repositories.map((repository, index) => (
             <li key={repository._id} class="group/item flex py-4 first:pt-0 last:pb-0">
-              <div className="w-full cursor-pointer" onClick={e => navigate(`/repository/${repository._id}`, {
-                                                              state: { repository: repository }
-                                                              })}>
+              <div className="w-full cursor-pointer" onClick={e => viewRepository(repository)}>
                 <p class="text-sm font-medium text-slate-900">{repository.owner}/{repository.name}</p>
                 <p class="text-sm text-slate-500 truncate">{repository.description}</p>
               </div>

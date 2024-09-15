@@ -37,7 +37,7 @@ function NewRepositoryPage() {
                     files: [
                       {
                         filename: "Readme.md",
-                        content: "Soy un readme",
+                        content: "# Readme file",
                         comments: [
                           {
                             userId: "567",

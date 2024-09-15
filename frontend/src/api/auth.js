@@ -24,3 +24,6 @@ export const createBranches = (branches, repositoryId) => axios.post(`/repositor
 export const getBranches = (repositoryId) => axios.get(`/repositories/${repositoryId}/create_branches`, {
   params: repositoryId
 });
+export const updateBranches = (branches, id) => axios.put(`/repositories/${id}/create_branches`, branches, {
+  params: {id}
+});
