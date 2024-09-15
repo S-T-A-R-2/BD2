@@ -8,7 +8,6 @@ export const RepositoryPage = () => {
 	const [username, setUsername] = useState(null);
 	const [file, setFile] = useState({name : "", content : ""});
 	const [files, setFiles] = useState([]);
-	const [password, setPassword] = useState("");
 	const location = useLocation();
 	const [branches, setBranches] = useState(null);
 	const [repository, setRepository] = useState(location.state ? location.state.repository : null);
@@ -16,6 +15,7 @@ export const RepositoryPage = () => {
 	const [branch, setBranch] = useState("");
 	const [menuBranchOptions, setMenuBranchOption] = useState([]);
 	const [actualBranch, setActualBranch] = useState(0);
+	const [currentFile, setCurrentFile] = useState(0);
 
 	useEffect(() => {
 		// Recuperar el nombre de usuario del login	
@@ -101,20 +101,50 @@ export const RepositoryPage = () => {
 	const FilesList = () => {
 		return (
 			<div class="relative scroll-pb-6 size-[500px]">
-		  	<ul role="list" class="p-6 divide-y divide-slate-100 bg-white text-black">
+		  	<ul role="list" class="p-2 divide-y divide-slate-100 bg-white text-black">
 			{files.map((file, index) => (
 			  <li class="group/item flex py-4 first:pt-0 last:pb-0">
 				<div className="w-full cursor-pointer">
 				  	<p class="text-sm font-medium text-slate-900">📂 {file.filename}</p>
 				</div>
-				<a class="group/edit invisible hover:bg-slate-200 group-hover/item:visible" onClick={e => downloadFile(file.name, file.content)}>
-					<button>Descargar</button>
-				</a>
+				<div class="flex flex-col">
+					<a class="text-sm group/edit invisible hover:bg-slate-200 group-hover/item:visible" onClick={e => downloadFile(file.filename, file.content)}>
+						<button>Descargar</button>
+					</a>
+					<a class="text-sm invisible hover:bg-slate-100 group-hover/item:visible">
+						<button onClick={e => setCurrentFile(index)}>comentarios</button>
+					</a>
+				</div>
 			  </li>
 			))}
 		  	</ul>
 			</div>
 		)
+	}
+
+	const CommentsList = () => {
+		if (files.length > 0) {
+			console.log(files[currentFile].comments);
+			return (
+				<div class="relative scroll-pb-6 size-[500px]">
+				  <ul role="list" class="p-6 divide-y divide-slate-100 bg-white text-black">
+				{files[currentFile].comments.map((comment, index) => (
+				  <li class="group/item flex py-4 first:pt-0 last:pb-0">
+					<div className="w-full cursor-pointer">
+						  <p class="text-sm font-medium text-slate-900">Fecha de creación: {comment.date}</p>
+						  <p class="text-sm font-medium text-slate-900">Usuario: {comment.userId}</p>
+						  <p class="text-sm font-medium text-slate-900">{comment.description}</p>
+					</div>
+					<a class="group/edit invisible hover:bg-slate-200 group-hover/item:visible" onClick={e => console.log(comment.date)}>
+						<button>Descargar</button>
+					</a>
+				  </li>
+				))}
+				  </ul>
+				</div>
+			)
+		}
+		
 	}
 
 	// Para mostrar el menú desplegable
@@ -152,7 +182,7 @@ export const RepositoryPage = () => {
 				  {
 					userId: "567",
 					date: "13-09-2024",
-					description: "Soy un comentario"
+					description: "Soy un nuevo comentario"
 				  }
 				]
 			  }
@@ -188,10 +218,17 @@ export const RepositoryPage = () => {
 				</div>
 			</div>
 
-			<div class="relative bg-zinc-800 bottom-[80px] rounded-md flex flex-col m-auto">
-				<h1>Archivos</h1>
-				<FilesList/>
+			<div class="relative bg-zinc-800 bottom-[80px] rounded-md flex flex-row m-auto">
+				<div class="relative bg-zinc-800 rounded-md flex flex-col m-auto">
+					<h1>Archivos</h1>
+					<FilesList/>
+				</div>
+				<div class="relative left-[20px] bg-zinc-800 rounded-md flex flex-col m-auto">
+					<h1>Comentarios</h1>
+					<CommentsList/>
+				</div>
 			</div>
+			
 	  </div>
 	);
 }
