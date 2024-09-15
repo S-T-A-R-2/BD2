@@ -15,3 +15,9 @@ export const getBranches = async (req, res) => {
     res.json(branches.docs);
     console.log(branches.docs);
 }
+
+export const updateBranches = async (req, res) => {
+    const {id} = req.params;
+    const response = await couchClient.insert(req.body, id);
+    res.json(response);
+}
