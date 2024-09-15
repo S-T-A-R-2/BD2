@@ -19,3 +19,8 @@ export const getFiles = (repositoryId) => axios.get(`/repositories/${repositoryI
     params: repositoryId
   });
 //export const getReposi
+
+export const createBranches = (branches, repositoryId) => axios.post(`/repositories/${repositoryId}/create_branches`, branches);
+export const getBranches = (repositoryId) => axios.get(`/repositories/${repositoryId}/create_branches`, {
+  params: repositoryId
+});
