@@ -60,7 +60,7 @@ let couchClient;
             console.log(`Database "${dbName}" created.`);
         }
         couchClient = couch.db.use(dbName);
-        console.log('CouchDB connected');
+        //console.log('CouchDB connected');
     } catch (err) {
         console.error('CouchDB connection error:', err);
     }
