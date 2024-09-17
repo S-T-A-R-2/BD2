@@ -9,16 +9,19 @@ function LoginPage() {
     const { register, handleSubmit, formState: {
         errors,
     } } = useForm();
-    const {signIn, isAuthenticated, errors: loginErrors = []} = useAuth();
+    const {signIn, isAuthenticated, setIsAuthenticated, errors: loginErrors = []} = useAuth();
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (isAuthenticated) navigate("/");
-    }, [isAuthenticated]);
+        if (isAuthenticated) {
+            navigate("/");
+        }
+    }, [isAuthenticated, navigate]);
 
     const onSubmit = handleSubmit( async (data) => {
         //console.log(data);
         signIn(data);
+
     });
 
     return (
