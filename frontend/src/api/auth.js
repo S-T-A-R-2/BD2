@@ -3,11 +3,13 @@ import axios from './axios';
 //const API = 'http://localhost:5000/api'
 
 export const registerRequest = (user) => axios.post(`/register`, user);
+export const createUser = (user) => axios.post('create-user', user);
 export const loginRequest = (user) => axios.post(`/login`, user);
 export const verifyTokenRequest = () => axios.get(`/verify`);
 
 
 export const createRepository = (repository) => axios.post(`/repositories`, repository);
+export const createRepoNeo = (repository) => axios.post('/create-repository', repository);
 export const getRepository = (repository) => axios.get(`/repositories/:id`, {
     params: repository
   });

@@ -1,20 +1,21 @@
 import React, {useState, useEffect} from 'react'
 import {useForm} from 'react-hook-form'
-import { createRepository, createBranches, getRepository } from '../api/auth';
+import { createRepository, createRepoNeo, createBranches, getRepository } from '../api/auth';
 import {TagsInput}  from 'react-tag-input-component';
 import '../reactTags.css';
+import { useAuth } from '../context/AuthContext';
+
 function NewRepositoryPage() {
     const { register, handleSubmit } = useForm();
     const [nameR, setName] = useState("name");
     const [descriptionR, setDescription] = useState("description");
     const [privateR, setPrivate] = useState(false);
     const [tagsR, setTags] = useState([]);
-    
+    const { user } = useAuth();    
 
     const createRepositoryAux = async () => {
-        const owner = "Gerald";
         const rep = {
-            owner: owner,
+            owner: user.username,
             name: nameR,
             description: descriptionR,
             branches: [{
@@ -28,6 +29,7 @@ function NewRepositoryPage() {
         
         try {
             await createRepository(rep);
+            await createRepoNeo(rep);  
             const response = await getRepository({ owner: "Gerald", name: nameR });
             const Branch = {
                 _id: response.data[0]._id.toString(),
