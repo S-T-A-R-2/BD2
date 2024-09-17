@@ -19,6 +19,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.6.1",
     "nano": "^10.1.4",
+    "neo4j-driver": "^5.24.1",
     "redis": "^4.7.0"
   }
 }
