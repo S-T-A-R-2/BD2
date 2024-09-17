@@ -17,6 +17,9 @@ export const redisClient = await client.connect();
 //admin es el nombre de usuario y con123 la contraseña que hayan puesto
 const couch = nano('http://admin:con123@127.0.0.1:5984');
 //test es el nombre de la base de datos
+export const couchClient = await couch.db.use('test');
+
+
 
 //MongoDB
 export const connectDB = async () => {

@@ -4,7 +4,6 @@ import Encrypter from '../libs/encrypter.js'
 import {createAccessToken} from '../libs/jwt.js'
 import jwt from 'jsonwebtoken'
 import { TOKEN_SECRET } from '../config.js'
-import { createAccount } from './relationships.controller.js'
 
 
 export const register = async (req, res) => {
@@ -23,8 +22,6 @@ export const register = async (req, res) => {
         if (userFound) {
             return res.status(409).json({ messages: ['the username already in use']});
         }
-
-        await createAccount(username);
 
         const user = {
             email: email_e,

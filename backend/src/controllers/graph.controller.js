@@ -29,20 +29,22 @@ export const createUser = async (req, res) => {
 
 // Create a repository node and OWNS relationship
 export const createRepository = async (req, res) => {
-  const { username, name } = req.body;
+  const { owner, name } = req.body;
 
-  if (!username || !name) {
+  console.log(owner);
+
+  if (!owner || !name) {
     return res.status(400).json({ error: 'Username and repository name are required' });
   }
 
   const operation = {
     operation: `
-      MATCH (u:User {username: $username})
+      MATCH (u:User {username: $owner})
       MERGE (r:Repository {name: $name})
       MERGE (u)-[:OWNS]->(r)
       RETURN u, r
     `,
-    parameters: { username, name }
+    parameters: { owner, name }
   };
 
   try {

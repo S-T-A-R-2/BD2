@@ -8,7 +8,7 @@ import {
     profile,
     verifyToken} from '../controllers/auth.controller.js'
 
-
+ 
 const router = Router();
 
 // CRUD
