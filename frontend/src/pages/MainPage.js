@@ -33,9 +33,10 @@ return (
 			<a href="/searchRepository" class="group block w-30 h-25 text-black rounded-lg p-2 bg-white shadow-lg hover:bg-sky-500">					
 				<h3 className="flex space-x-3text-slate-900 group-hover:text-white text-sm font-semibold inline">🔎 Buscar Repositorio</h3>	
 			</a>
+			{!isAuthenticated && (
 			<a href="/login" class="group block w-30 h-25 text-black rounded-lg p-2 bg-white shadow-lg hover:bg-sky-500">					
 				<h3 className="flex space-x-3text-slate-900 group-hover:text-white text-sm font-semibold inline text-center">🚪 Login</h3>	
-			</a>
+			</a> )}
 			<a href="/login" class="group block w-30 h-25 text-black rounded-lg p-2 bg-white shadow-lg hover:bg-sky-500">					
 				<h3 className="flex space-x-3text-slate-900 group-hover:text-white text-sm font-semibold inline text-center">🚪 Ver perfil</h3>	
 			</a>

@@ -5,6 +5,7 @@ import authRoutes from './routes/auth.route.js'
 import filesRoutes from './routes/file.route.js'
 import cookieParser from 'cookie-parser'
 import branchesRoutes from './routes/branches.route.js'
+import graphRoutes from './routes/graph.route.js'
 import cors from 'cors';
 import {connectDB} from './db.js'
 connectDB();
@@ -25,6 +26,7 @@ app.use("/api", repositoriesRoutes);
 app.use("/api", authRoutes);
 app.use("/api", filesRoutes);
 app.use("/api", branchesRoutes);
+app.use("/api", graphRoutes);
 app.get("/", (req, resp) => {
 
     resp.send("App is Working");

@@ -27,15 +27,35 @@ export const RepositoryPage = () => {
 			localStorage.removeItem('loggedIn');
 		}
 	}, []);
-	useEffect(() => {
-		const getBranchesAux = async () => {
-			if (repository) {
-				const dataT = (await getBranches({repositoryId : repository._id})).data[0];
-				setBranches(dataT.branches);
-			}
-		}
-		getBranchesAux();
-	}, [repository]);
+
+	// useEffect(() => {
+	// 	const getBranchesAux = async () => {
+	// 		if (repository) {
+	// 			const dataT = (await getBranches({repositoryId : repository._id})).data[0];
+	// 			setBranches(dataT.branches);
+	// 		}
+	// 	}
+	// 	getBranchesAux();
+	// }, [repository]);
+    useEffect(() => {
+        const getBranchesAux = async () => {
+            if (repository) {
+                try {
+                    const response = await getBranches({ repositoryId: repository._id });
+                    const dataT = response.data[0];
+                    if (dataT && dataT.branches) {
+                        setBranches(dataT.branches);
+                    } else {
+                        console.error('Branches not found in the response');
+                    }
+                } catch (error) {
+                    console.error('Error fetching branches:', error);
+                }
+            }
+        };
+        getBranchesAux();
+    }, [repository]);
+
 	useEffect(() => {
 		if (branches) {
 			const current = branches[actualBranch];
@@ -44,6 +64,8 @@ export const RepositoryPage = () => {
 			updateMenuBranches();
 		}
 	}, [branches, actualBranch]);
+
+	
 	// Descargar archivos
 	function download(filename, text) {
 		var element = document.createElement('a');
