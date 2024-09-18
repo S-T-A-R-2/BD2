@@ -173,32 +173,44 @@ export const createCommentOnComment = async (req, res) => {
 
 export const subscribe = async (req, res) => {
   const {username} = req.body
-  const repositoryName = req.params.repositoryName;
+  const {repositoryName} = req.query;
+
+if (!username || !repositoryName) {
+  console.log(username,repositoryName);
+  return res.status(400).send('Missing username or repository name to subscribe');
+}
+
   const query = {
     operation: `
-    MATCH q = (u:User {username: $username})-[:subscribes]->(r:Repository {name: $repositoryName})
-    RETURN q;
+    MATCH (u:User {username: $username})-[q:subscribes]->(r:Repository {name: $repositoryName})
+    RETURN EXISTS((u)-[:subscribes]->(r)) AS relation;
     `,
     parameters: {username, repositoryName}
+
   };
-  const {records, summary} = await connectNeo4JRead(query);
-  console.log("CHicharron prensdo", records, "Chicharron prensado")
-  /*
-  const operation = {
-  operation: `
-      MATCH (u:User {username: $username})
-      MATCH (r:Repository {name: $repositoryName})
-      MERGE (u)-[s:subscribes]->(r)
-      RETURN u, s, r
-      `
-  , parameters: {username, repositoryName}}
-    try {
-        const result = await connectNeo4J(operation);
-        const userNode = result.records[0].get('u');
-        const repoNode = result.records[0].get('r');
-        res.status(200).json({ message: 'Subscription made', user: userNode, comment: commentNode, repoName: repoNode });
-      } catch (err) {
-        console.error(`Error subscribing to the repository: ${err}`);
-        res.status(500).json({ error: 'Error subscribing to the repository: ', details: err.message });
-      }*/
-}
+  const result = await connectNeo4J(query);
+  if (result.records[0]) {
+    console.log("existo");
+  } else {
+    const operation = {
+      operation: `
+          MATCH (u:User {username: $username})
+          MATCH (r:Repository {name: $repositoryName})
+          MERGE (u)-[s:subscribes]->(r)
+          RETURN u, s, r
+          `
+      , parameters: {username, repositoryName}}
+        try {
+            const result = await connectNeo4J(operation);
+            const userNode = result.records[0].get('u');
+            const repoNode = result.records[0].get('r');
+            res.status(200).json({ message: 'Subscription made', user: userNode, repoName: repoNode });
+          } catch (err) {
+            console.error(`Error subscribing to the repository: ${err}`);
+            res.status(500).json({ error: 'Error subscribing to the repository: ', details: err.message });
+          }
+    }
+  }
+
+  
+  
