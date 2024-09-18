@@ -121,13 +121,14 @@ export const RepositoryPage = () => {
 	
 	const addFilesA = () => {
 		console.log("pararpaprapaan");
-		/*
+		
 		localStorage.setItem('currentBranch', JSON.stringify(actualBranch));
 		localStorage.setItem('repositoryId', JSON.stringify(repository._id));
-		navigate(`/repository/${repository._id}/AddFilePage`);*/
+		navigate(`/repository/${repository._id}/AddFilePage`);
 	}
 
 	const subscribeRepository = () => {
+		console.log("periquito",username, repository.name)
 		subscribe(username, repository.name);
 	}
 

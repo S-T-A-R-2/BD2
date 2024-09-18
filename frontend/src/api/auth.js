@@ -30,6 +30,6 @@ export const updateBranches = (branches, id) => axios.put(`/repositories/${id}/c
   params: {id}
 });
 
-export const subscribe = (username, repositoryName, repositoryId) => axios.put(`/repository/${repositoryId}`, {
+export const subscribe = (username, repositoryName, repositoryId) => axios.post(`/repositories/${repositoryId}`, {
   name: username, repoName: repositoryName
 })

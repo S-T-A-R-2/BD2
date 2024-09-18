@@ -16,6 +16,6 @@ router.post('/user-likes-repository', userLikesRepository);
 router.post('/user-follows-repository', userFollowsRepository);
 router.post('/create-comment-on-repository', createCommentOnRepository);
 router.post('/create-comment-on-comment', createCommentOnComment);
-router.post('/repository/:id', subscribe);
+router.post('/repositories/:id', subscribe);
 
 export default router;
