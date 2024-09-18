@@ -30,7 +30,7 @@ function NewRepositoryPage() {
         try {
             await createRepository(rep);
             await createRepoNeo(rep);  
-            const response = await getRepository({ owner: "Gerald", name: nameR });
+            const response = await getRepository({ owner: user.username, name: nameR });
             const Branch = {
                 _id: response.data[0]._id.toString(),
                 branches: [

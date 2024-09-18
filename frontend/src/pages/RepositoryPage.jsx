@@ -28,21 +28,12 @@ export const RepositoryPage = () => {
 		}
 	}, []);
 
-	// useEffect(() => {
-	// 	const getBranchesAux = async () => {
-	// 		if (repository) {
-	// 			const dataT = (await getBranches({repositoryId : repository._id})).data[0];
-	// 			setBranches(dataT.branches);
-	// 		}
-	// 	}
-	// 	getBranchesAux();
-	// }, [repository]);
-    useEffect(() => {
+	useEffect(() => {
         const getBranchesAux = async () => {
             if (repository) {
                 try {
                     const response = await getBranches({ repositoryId: repository._id });
-                    const dataT = response.data[0];
+                    const dataT = response.data;
                     if (dataT && dataT.branches) {
                         setBranches(dataT.branches);
                     } else {
@@ -65,25 +56,43 @@ export const RepositoryPage = () => {
 		}
 	}, [branches, actualBranch]);
 
+
+	const b64toBlob = (b64Data, contentType='', sliceSize=512) => {
+		const byteCharacters = atob(b64Data); // Decodifica el base64
+		const byteArrays = [];
+	  
+		for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+			const slice = byteCharacters.slice(offset, offset + sliceSize);
+			const byteNumbers = new Array(slice.length);
+			
+			for (let i = 0; i < slice.length; i++) {
+				byteNumbers[i] = slice.charCodeAt(i);
+			}
+			
+			const byteArray = new Uint8Array(byteNumbers);
+			byteArrays.push(byteArray);
+		}
+		
+		return new Blob(byteArrays, { type: contentType });
+		//https://stackoverflow.com/questions/16245767/creating-a-blob-from-a-base64-string-in-javascript
+	};
 	
-	// Descargar archivos
-	function download(filename, text) {
-		var element = document.createElement('a');
-		element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-		element.setAttribute('download', filename);
-	  
-		element.style.display = 'none';
-		document.body.appendChild(element);
-	  
-		element.click();
-	  
-		document.body.removeChild(element);
-	}
+	const downloadFile = async (fileA) => {
+       	const attachment = fileA._attachments[fileA.filename];
+        const file = b64toBlob(attachment.data, attachment.content_type);
+        
+		const element = document.createElement('a');
+        element.href = URL.createObjectURL(file);
+        element.download = fileA.filename;
+        
+        document.body.appendChild(element);
+        element.click();
+        
+		//https://stackoverflow.com/questions/16245767/creating-a-blob-from-a-base64-string-in-javascript
+        document.body.removeChild(element);
+        URL.revokeObjectURL(element.href);
+    }
 	
-	// descargar archivo
-	const downloadFile = (file, content) => {
-		download(file, content);
-	}
 	// Colocar lista de archivos en la interfaz
 	const FilesList = () => {
 		return (
@@ -95,7 +104,7 @@ export const RepositoryPage = () => {
 				  	<p class="text-sm font-medium text-slate-900">📂 {file.filename}</p>
 				</div>
 				<div class="flex flex-col">
-					<a class="text-sm group/edit invisible hover:bg-slate-200 group-hover/item:visible" onClick={e => downloadFile(file.filename, file.content)}>
+					<a class="text-sm group/edit invisible hover:bg-slate-200 group-hover/item:visible" onClick={e => downloadFile(file)}>
 						<button>Descargar</button>
 					</a>
 					<a class="text-sm invisible hover:bg-slate-100 group-hover/item:visible">
@@ -182,7 +191,6 @@ export const RepositoryPage = () => {
 			  }
 			]
 		}
-		console.log("Holaaaa")
 		setBranches([...branches, newBranch]);
 	}
 
