@@ -12,7 +12,6 @@ function SearchRepositoryPage() {
   const location = useLocation();
   const [user, setUser] = useState(location.state ? location.state.user : null);
   /* Conexión con la base de datos para obtener los repositorios*/
-  console.log("xczivjasdjf",user);
   const findRepositoriesAux = async () => {
     setLoading(true);
     const [param1, param2] = params.split('/'); // Parametros para buscar el repositorio

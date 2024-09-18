@@ -129,7 +129,7 @@ export const RepositoryPage = () => {
 	}
 
 	const subscribeRepository = () => {
-		subscribe(user, repository.name, repository._id);
+		subscribe(user.username, repository.name, repository._id);
 	}
 
 	const menuOptions = [

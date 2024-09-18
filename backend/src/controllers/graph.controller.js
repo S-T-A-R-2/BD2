@@ -1,4 +1,4 @@
-import { connectNeo4J } from '../db.js';
+import { connectNeo4J, connectNeo4JRead } from '../db.js';
 
 
 // Create a user node
@@ -172,19 +172,17 @@ export const createCommentOnComment = async (req, res) => {
 };
 
 export const subscribe = async (req, res) => {
-  console.log("adios",req);
-  let username = req.name;
-  let repositoryName = req.repositoryName;
-
+  const {username} = req.body
+  const repositoryName = req.params.repositoryName;
   const query = {
     operation: `
     MATCH q = (u:User {username: $username})-[:subscribes]->(r:Repository {name: $repositoryName})
     RETURN q;
     `,
-     parameters: {username, repositoryName}
-  }
-  const result = await connectNeo4J(query);
-  console.log("CHicharron prensdo", result, "Chicharron prensado")
+    parameters: {username, repositoryName}
+  };
+  const {records, summary} = await connectNeo4JRead(query);
+  console.log("CHicharron prensdo", records, "Chicharron prensado")
   /*
   const operation = {
   operation: `

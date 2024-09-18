@@ -73,3 +73,37 @@ export const connectNeo4J = async (dbOperation) => {
   }
 };
 
+export const connectNeo4JRead = async (dbOperation) => { 
+  const URI = process.env.NEO4J_URI;
+  const USER = 'neo4j';
+  const PASSWORD = process.env.NEO4J_PASSWORD;
+  let driver;
+  
+  console.log("conectando neo4j");
+
+  try {
+    driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD));
+    await driver.verifyConnectivity();
+    
+    console.log("conectado");
+
+    const { operation, parameters } = dbOperation;
+
+    let { records, summary } = await driver.executeQuery({operation, parameters});
+    // Destructure operation and parameters from dbOperation
+    
+    
+    // Execute the operation with session.run
+      
+    console.log("operacion terminada");
+
+    return { records, summary };
+
+  } catch (err) {
+    console.error(`Request error\n${err}\nCause: ${err.cause}`);
+    throw err;
+  } finally {
+    if (driver) await driver.close();
+  }
+};
+
