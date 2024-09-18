@@ -2,10 +2,12 @@ import React, {useState, useEffect} from 'react'
 import { useLocation, useNavigate }  from 'react-router-dom';
 import { createFile, getFiles, getBranches, subscribe } from '../api/auth.js';
 import { Dropdown, FileBrowser, Button } from '../components/Dropdown.js';
+import { useAuth } from '../context/AuthContext';
 
 export const RepositoryPage = () => {
 	const navigate = useNavigate();
 	const [username, setUsername] = useState(null);
+	const { user } = useAuth();  
 	const [files, setFiles] = useState([]);
 	const location = useLocation();
 	const [branches, setBranches] = useState(null);
@@ -120,16 +122,14 @@ export const RepositoryPage = () => {
 	};
 	
 	const addFilesA = () => {
-		console.log("pararpaprapaan");
-		
 		localStorage.setItem('currentBranch', JSON.stringify(actualBranch));
 		localStorage.setItem('repositoryId', JSON.stringify(repository._id));
 		navigate(`/repository/${repository._id}/AddFilePage`);
 	}
 
 	const subscribeRepository = () => {
-		console.log("periquito",username, repository.name)
-		subscribe(username, repository.name);
+		console.log(user);
+		//subscribe(user, repository.name);
 	}
 
 	const menuOptions = [

@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 function SearchRepositoryPage() {
   // Variables
   const navigate = useNavigate();
+  const [user, setUser] = useState();
   const [params, setParams] = useState("");
   const [loading, setLoading] = useState(false);
   const [repositories, setRepositories] = useState([]);
@@ -30,7 +31,7 @@ function SearchRepositoryPage() {
   const viewRepository = (repository) => {
     localStorage.setItem('repository', JSON.stringify(repository));
     navigate(`/repository/${repository._id}`, {
-      state: { repository: repository }
+      state: { repository: repository, user: user }
       })
   }
   

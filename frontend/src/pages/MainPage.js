@@ -30,9 +30,8 @@ return (
  
 			  
 		<div class="absolute top-0 right-0 ide-sm hide-md mb-1 d-flex flex-justify-between flex-items-center">
-			<a href="/searchRepository" class="group block w-30 h-25 text-black rounded-lg p-2 bg-white shadow-lg hover:bg-sky-500">					
+			<button onClick={navigate("/searchRepository",{state:user})} class="group block w-60 h-35 text-black rounded-lg p-2 bg-white shadow-lg hover:bg-sky-500"/>					
 				<h3 className="flex space-x-3text-slate-900 group-hover:text-white text-sm font-semibold inline">🔎 Buscar Repositorio</h3>	
-			</a>
 			{!isAuthenticated && (
 			<a href="/login" class="group block w-30 h-25 text-black rounded-lg p-2 bg-white shadow-lg hover:bg-sky-500">					
 				<h3 className="flex space-x-3text-slate-900 group-hover:text-white text-sm font-semibold inline text-center">🚪 Login</h3>	
