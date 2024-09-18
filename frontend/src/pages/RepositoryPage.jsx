@@ -129,6 +129,7 @@ export const RepositoryPage = () => {
 	}
 
 	const subscribeRepository = () => {
+		console.log("FRont: ", user.username, repository.name);
 		subscribe(user.username, repository.name, repository._id);
 	}
 
