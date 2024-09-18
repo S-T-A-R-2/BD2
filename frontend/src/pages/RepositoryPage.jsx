@@ -7,9 +7,7 @@ import { useAuth } from '../context/AuthContext';
 export const RepositoryPage = () => {
 	const navigate = useNavigate();
 	const [username, setUsername] = useState(null);
-	const { user } = useAuth();  
 	const [files, setFiles] = useState([]);
-	const location = useLocation();
 	const [branches, setBranches] = useState(null);
 	const [repository, setRepository] = useState(() => {
         const savedRepository = localStorage.getItem('repository');
@@ -20,6 +18,9 @@ export const RepositoryPage = () => {
 	const [menuBranchOptions, setMenuBranchOption] = useState([]);
 	const [actualBranch, setActualBranch] = useState(0);
 	const [currentFile, setCurrentFile] = useState(0);
+	const location = useLocation();
+  	const [user, setUser] = useState(location.state ? location.state.user : null);
+
 	useEffect(() => {
 		// Recuperar el nombre de usuario del login	
 		const storedUsername = localStorage.getItem('user');
@@ -128,8 +129,7 @@ export const RepositoryPage = () => {
 	}
 
 	const subscribeRepository = () => {
-		console.log(user);
-		//subscribe(user, repository.name);
+		subscribe(user, repository.name, repository._id);
 	}
 
 	const menuOptions = [

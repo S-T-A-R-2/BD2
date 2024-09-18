@@ -1,17 +1,18 @@
 import React, {useState, useEffect} from 'react'
 import {useForm} from 'react-hook-form'
 import { getRepository, getRepositories } from '../api/auth';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 function SearchRepositoryPage() {
   // Variables
   const navigate = useNavigate();
-  const [user, setUser] = useState();
   const [params, setParams] = useState("");
   const [loading, setLoading] = useState(false);
   const [repositories, setRepositories] = useState([]);
-
+  const location = useLocation();
+  const [user, setUser] = useState(location.state ? location.state.user : null);
   /* Conexión con la base de datos para obtener los repositorios*/
+  console.log("xczivjasdjf",user);
   const findRepositoriesAux = async () => {
     setLoading(true);
     const [param1, param2] = params.split('/'); // Parametros para buscar el repositorio
@@ -31,7 +32,7 @@ function SearchRepositoryPage() {
   const viewRepository = (repository) => {
     localStorage.setItem('repository', JSON.stringify(repository));
     navigate(`/repository/${repository._id}`, {
-      state: { repository: repository, user: user }
+      state: { repository: repository, user: user}
       })
   }
   

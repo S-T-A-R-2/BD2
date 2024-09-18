@@ -172,6 +172,7 @@ export const createCommentOnComment = async (req, res) => {
 };
 
 export const subscribe = async (req, res) => {
+  console.log("adios",req);
   let username = req.name;
   let repositoryName = req.repositoryName;
 
@@ -179,10 +180,9 @@ export const subscribe = async (req, res) => {
     operation: `
     MATCH q = (u:User {username: $username})-[:subscribes]->(r:Repository {name: $repositoryName})
     RETURN q;
-    `
-    , parameters: {username, repositoryName}
+    `,
+     parameters: {username, repositoryName}
   }
-
   const result = await connectNeo4J(query);
   console.log("CHicharron prensdo", result, "Chicharron prensado")
   /*
