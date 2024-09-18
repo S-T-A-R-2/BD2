@@ -4,7 +4,8 @@ import {createUser,
         userLikesRepository, 
         userFollowsRepository,
         createCommentOnRepository,
-        createCommentOnComment } from '../controllers/graph.controller.js';
+        createCommentOnComment,
+        subscribe } from '../controllers/graph.controller.js';
    
 
 const router = Router();
@@ -15,5 +16,6 @@ router.post('/user-likes-repository', userLikesRepository);
 router.post('/user-follows-repository', userFollowsRepository);
 router.post('/create-comment-on-repository', createCommentOnRepository);
 router.post('/create-comment-on-comment', createCommentOnComment);
+router.post('/repository/:id', subscribe);
 
 export default router;

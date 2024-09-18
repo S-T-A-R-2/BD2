@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import { useLocation, useNavigate }  from 'react-router-dom';
-import { createFile, getFiles, getBranches } from '../api/auth.js';
+import { createFile, getFiles, getBranches, subscribe } from '../api/auth.js';
 import { Dropdown, FileBrowser, Button } from '../components/Dropdown.js';
 
 export const RepositoryPage = () => {
@@ -27,35 +27,16 @@ export const RepositoryPage = () => {
 			localStorage.removeItem('loggedIn');
 		}
 	}, []);
-
-	// useEffect(() => {
-	// 	const getBranchesAux = async () => {
-	// 		if (repository) {
-	// 			const dataT = (await getBranches({repositoryId : repository._id})).data[0];
-	// 			setBranches(dataT.branches);
-	// 		}
-	// 	}
-	// 	getBranchesAux();
-	// }, [repository]);
-    useEffect(() => {
-        const getBranchesAux = async () => {
-            if (repository) {
-                try {
-                    const response = await getBranches({ repositoryId: repository._id });
-                    const dataT = response.data[0];
-                    if (dataT && dataT.branches) {
-                        setBranches(dataT.branches);
-                    } else {
-                        console.error('Branches not found in the response');
-                    }
-                } catch (error) {
-                    console.error('Error fetching branches:', error);
-                }
-            }
-        };
-        getBranchesAux();
-    }, [repository]);
-
+	useEffect(() => {
+		const getBranchesAux = async (res) => {
+			if (repository) {
+				const dataT = (await getBranches({repositoryId : repository._id}));
+				setBranches(dataT.branches);
+				
+			}
+		}
+		getBranchesAux();
+	}, [repository]);
 	useEffect(() => {
 		if (branches) {
 			const current = branches[actualBranch];
@@ -64,8 +45,6 @@ export const RepositoryPage = () => {
 			updateMenuBranches();
 		}
 	}, [branches, actualBranch]);
-
-	
 	// Descargar archivos
 	function download(filename, text) {
 		var element = document.createElement('a');
@@ -141,16 +120,23 @@ export const RepositoryPage = () => {
 	};
 	
 	const addFilesA = () => {
+		console.log("pararpaprapaan");
+		/*
 		localStorage.setItem('currentBranch', JSON.stringify(actualBranch));
 		localStorage.setItem('repositoryId', JSON.stringify(repository._id));
-		navigate(`/repository/${repository._id}/AddFilePage`);
+		navigate(`/repository/${repository._id}/AddFilePage`);*/
+	}
+
+	const subscribeRepository = () => {
+		subscribe(username, repository.name);
 	}
 
 	const menuOptions = [
 		{ label: 'Crear nuevo archivo', link: '#', onClick: () => navigate(`/repository/${repository._id}/CreateFilePage`, {state: {repository : repository}}) },
 		{ label: 'Añadir archivo', link: '#', onClick: () => addFilesA()},
 		{ label: 'Descargar', link: '#', onClick: () =>  downloadFile()},
-		{ label: 'Crear nueva rama', onClick: () => createNewBranch()}
+		{ label: 'Crear nueva rama', onClick: () => createNewBranch()},
+		{ label: 'Suscribirse', onClick: () => subscribeRepository()}
 	];
 
 	const [isOpenBranchMenu, setIsOpenBranchMenu] = useState(false);
@@ -205,6 +191,7 @@ export const RepositoryPage = () => {
 			<div className = "relative top-[100px] flex flex-row">
 				<Dropdown buttonText="Opciones" action={toggleMenu} isActive={isOpen} options={menuOptions}/>
 				<Dropdown buttonText="Ramas" action={toggleBranchMenu} isActive={isOpenBranchMenu} options={menuBranchOptions}/>
+				<></>
 				<div className='flex'>
 					<Button text="historial de commits" onClick={e => console.log("Hola")}/>
 					<Button text={mergeText} onClick={e => console.log("Hola")}/>					

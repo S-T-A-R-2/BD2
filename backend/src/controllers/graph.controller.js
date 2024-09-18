@@ -170,3 +170,37 @@ export const createCommentOnComment = async (req, res) => {
     res.status(500).json({ error: 'Error creating comment and linking to parent comment and user', details: err.message });
   }
 };
+
+export const subscribe = async (req, res) => {
+  let username = req.name;
+  let repositoryName = req.repositoryName;
+
+  const query = {
+    operation: `
+    MATCH q = (u:User {username: $username})-[:subscribes]->(r:Repository {name: $repositoryName})
+    RETURN q;
+    `
+    , parameters: {username, repositoryName}
+  }
+
+  const result = await connectNeo4J(query);
+  console.log("CHicharron prensdo", result, "Chicharron prensado")
+  /*
+  const operation = {
+  operation: `
+      MATCH (u:User {username: $username})
+      MATCH (r:Repository {name: $repositoryName})
+      MERGE (u)-[s:subscribes]->(r)
+      RETURN u, s, r
+      `
+  , parameters: {username, repositoryName}}
+    try {
+        const result = await connectNeo4J(operation);
+        const userNode = result.records[0].get('u');
+        const repoNode = result.records[0].get('r');
+        res.status(200).json({ message: 'Subscription made', user: userNode, comment: commentNode, repoName: repoNode });
+      } catch (err) {
+        console.error(`Error subscribing to the repository: ${err}`);
+        res.status(500).json({ error: 'Error subscribing to the repository: ', details: err.message });
+      }*/
+}

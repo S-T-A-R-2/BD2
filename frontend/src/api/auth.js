@@ -29,3 +29,7 @@ export const getBranches = (repositoryId) => axios.get(`/repositories/${reposito
 export const updateBranches = (branches, id) => axios.put(`/repositories/${id}/create_branches`, branches, {
   params: {id}
 });
+
+export const subscribe = (username, repositoryName, repositoryId) => axios.put(`/repository/${repositoryId}`, {
+  name: username, repoName: repositoryName
+})

@@ -14,3 +14,17 @@ export const authRequired = (req, res, next) => {
         next();
     })
 }
+
+//Validar el usuario
+export const authOptional = (req, res, next) => {
+    const {token} = req.cookies;
+    if (!token) return false;
+
+    jwt.verify(token, TOKEN_SECRET, (err, user) => {
+        if (err) return false;
+
+        req.user = user;
+        next();
+        return true;
+    })
+}
