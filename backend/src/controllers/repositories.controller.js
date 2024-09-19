@@ -6,7 +6,6 @@ export const getRepositories = async (req, res) => {
         const {name} = req.query;
         const repositories = await Repository.find({name: name});
         res.json(repositories);
-        console.log(repositories);
     } catch (error) {
         res.status(500).json({ message: "Error fetching repositories", error: error.message });
     }
@@ -16,7 +15,6 @@ export const getRepository = async (req, res) => {
         const {owner, name} = req.query;
         const repositories = await Repository.find({owner: owner, name: name});
         res.json(repositories);
-        console.log(repositories);
     } catch (error) {
         res.status(500).json({ message: "Error fetching repositories", error: error.message });
     }

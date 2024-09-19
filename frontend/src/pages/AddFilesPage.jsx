@@ -1,10 +1,8 @@
 import React, {useState, useEffect} from 'react'
-import {useForm} from 'react-hook-form'
 import { getRepository, getBranches, updateBranches } from '../api/auth';
 import { useLocation, useNavigate }  from 'react-router-dom';
 import { Dropdown, FileBrowser, Button } from '../components/Dropdown.js';
 export const AddFilesPage = () => {
-    console.log("Hola");
     const location = useLocation();
     const [repository, setRepository] = useState(null);
     const [branches, setBranches] = useState(null);
@@ -15,7 +13,7 @@ export const AddFilesPage = () => {
     useEffect(() => {
 		const getBranchesAux = async () => {
 			if (id) {
-				const dataT = (await getBranches({repositoryId : id})).data[0];
+				const dataT = (await getBranches({repositoryId : id})).data;
 				setBranches(dataT.branches);
                 setRepository(dataT);
 			}
@@ -35,24 +33,28 @@ export const AddFilesPage = () => {
         const files = event.target.files;
         const fileArray = Array.from(files);
         
+        const reader = new FileReader();
         fileArray.forEach(file => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
+            reader.onloadend = () => {
+                const base64String = reader.result.split(",")[1];
                 setFilesContent(prev => [
-                    ...prev,
-                    {filename: file.name, content: e.target.result}
-                ]);
+                ...prev,
+                {   filename: file.name,
+                    _attachments: {
+                        [file.name] : {
+                        contentType: file.type,
+                        data: base64String}
+                    }
+                }]);
             };
-            reader.readAsText(file);
+            reader.readAsDataURL(file);
         });
         setSelectedFiles(fileArray);
     };
-    const commitAction = async () => {
+    const commitAction = async () => {    
         repository.branches[current].files = [...branches[current].files, ...filesContent]
-        console.log("Ahí viene");
-        console.log(await updateBranches(repository, id));
+        await updateBranches(repository, id);
     }
-    
     return (
         <div className='relative text-white bg-zinc-800 flex flex-col m-auto h-screen'>
             <p>Hola mundo</p>

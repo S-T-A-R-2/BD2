@@ -1,19 +1,20 @@
 import {couchClient} from '../db.js'
 
 export const createBranches = async (req, res) => {
+    console.log("Se creo la rama");
     console.log(req.body);
-    //var async = require('async');
-    //const fs = require('fs');
-    await couchClient.insert(req.body);
-    res.json("hola");
+    const response = await couchClient.insert(req.body);
+    res.json(response);
+    
 }
 
 export const getBranches = async (req, res) => {
     const {repositoryId} = req.query;
     const query = { selector: { _id : repositoryId } }
     const branches = (await couchClient.find(query));
-    res.json(branches.docs);
-    console.log(branches.docs);
+    //branches.docs[0].branches[0].files[3].content = await db.attachment.get(branches.docs[0]._id, files[3].filename);
+    console.log(branches.docs[0].branches[0].files[3]);
+    res.json(branches.docs[0]);
 }
 
 export const updateBranches = async (req, res) => {
