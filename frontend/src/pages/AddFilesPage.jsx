@@ -103,7 +103,6 @@ export const AddFilesPage = () => {
             const addCommitToFile = (documentCommits.files.find(f => f.filename == newFile.filename))
             addCommitToFile.commits = [...addCommitToFile.commits, commit]
         }
-        setReady(prev => !prev);
     }
 
     /* Revisa cuales archivos ya se encuentran en la base de datos*/
