@@ -174,7 +174,9 @@ export const createCommentOnComment = async (req, res) => {
 export const subscribe = async (req, res) => {
   const {username} = req.body
   const {repositoryName} = req.query;
-
+  //Variable enviada al front end
+  let message;
+//Valida que exista el usuario y el repositorio a suscribirse
 if (!username || !repositoryName) {
   console.log(username,repositoryName);
   return res.status(400).send('Missing username or repository name to subscribe');
@@ -189,10 +191,20 @@ if (!username || !repositoryName) {
 
   };
   const result = await connectNeo4J(query);
+  //Si ya existe la elimina
+  let operation;
   if (result.records[0]) {
-    console.log("existo");
+    operation = {
+        operation: `
+          MATCH (p:User {username:$username})-[s:subscribes]
+          ->(r:Repository {name:$repositoryName})
+          DELETE s;
+          `,
+           parameters: {username, repositoryName}}
+    message = "No suscrito";
   } else {
-    const operation = {
+    //Si no existe la crea
+    operation = {
       operation: `
           MATCH (u:User {username: $username})
           MATCH (r:Repository {name: $repositoryName})
@@ -200,16 +212,16 @@ if (!username || !repositoryName) {
           RETURN u, s, r
           `
       , parameters: {username, repositoryName}}
-        try {
-            const result = await connectNeo4J(operation);
-            const userNode = result.records[0].get('u');
-            const repoNode = result.records[0].get('r');
-            res.status(200).json({ message: 'Subscription made', user: userNode, repoName: repoNode });
-          } catch (err) {
-            console.error(`Error subscribing to the repository: ${err}`);
-            res.status(500).json({ error: 'Error subscribing to the repository: ', details: err.message });
-          }
+    message = "Suscrito";
     }
+  try {
+      const result = await connectNeo4J(operation);
+      res.status(200).json({ message: 'Subscription made', message: message});
+    } catch (err) {
+      console.error(`Error subscribing to the repository: ${err}`);
+      res.status(500).json({ error: 'Error subscribing to the repository: ', details: err.message });
+    }
+    
   }
 
   
