@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import { useLocation, useNavigate }  from 'react-router-dom';
-import { createFile, getFiles, getBranches, subscribe } from '../api/auth.js';
+import { createFile, getFiles, getBranches, subscribe, checkSubscription } from '../api/auth.js';
 import { Dropdown, FileBrowser, Button } from '../components/Dropdown.js';
 
 export const RepositoryPage = () => {
@@ -20,6 +20,9 @@ export const RepositoryPage = () => {
 	const location = useLocation();
   	const [user, setUser] = useState(location.state ? location.state.user : null);
 	const [subscribed, setSubscribed] = useState(" ");
+	//notOwner = false : usuario actual es el dueño (desactiva opcion de suscribirse)
+	const [notOwner, setNotOwner] = useState(true);
+	
 
 	useEffect(() => {
 		// Recuperar el nombre de usuario del login	
@@ -56,8 +59,22 @@ export const RepositoryPage = () => {
 			setBranch(current);
 			setFiles(current.files);
 			updateMenuBranches();
+			check();
 		}
 	}, [branches, actualBranch]);
+
+	//Revisa si el usuario esta suscrito
+	const check = () => { 
+		if (!user.username.localeCompare(repository.owner)) {
+			console.log("NO OUNER");
+			setNotOwner(false);
+		} else 
+		if (user && repository) {
+			checkSubscription(user.username, repository.name, repository._id).then(function(res) {
+				setSubscribed(res.data.message);
+			})
+		} 
+	}
 
 
 	const b64toBlob = (b64Data, contentType='', sliceSize=512) => {
@@ -159,10 +176,13 @@ export const RepositoryPage = () => {
 	}
 
 	const subscribeRepository = () => {
-		console.log("FRont: ", user.username, repository.name);
-		subscribe(user.username, repository.name, repository._id).then(function(res) {
-			setSubscribed(res.data.message);
-		});
+		if (user && repository) {
+			subscribe(user.username, repository.name, repository._id).then(function(res) {
+				setSubscribed(res.data.message);
+			});
+		} else {
+			alert("Debe iniciar sesión para suscribirse");
+		}
 	}
 
 	const menuOptions = [
@@ -220,13 +240,15 @@ export const RepositoryPage = () => {
 				<h2>Usuario: {username}</h2>
 				<p>{repository.description}</p>
 				<p>{subscribed}</p>
+				{notOwner && (
 				<div style={{marginLeft: '200px'}}>
 					<Button text="Suscribirse" onClick={subscribeRepository}/>
 				</div>
+				)}
             </div>
 
 			{(
-				subscribed=="Suscrito" && <div className = "relative top-[100px] flex flex-row">
+				(subscribed=="Suscrito" || notOwner == false) && <div className = "relative top-[100px] flex flex-row">
 				<Dropdown buttonText="Opciones" action={toggleMenu} isActive={isOpen} options={menuOptions}/>
 				<Dropdown buttonText="Ramas" action={toggleBranchMenu} isActive={isOpenBranchMenu} options={menuBranchOptions}/>
 				<></>

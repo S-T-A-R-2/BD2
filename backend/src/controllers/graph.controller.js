@@ -171,6 +171,33 @@ export const createCommentOnComment = async (req, res) => {
   }
 };
 
+export const checkSubscription = async (req, res) => {
+  const {username} = req.body
+  const {repositoryName} = req.query;
+//Valida que exista el usuario y el repositorio a suscribirse
+
+if (!username || !repositoryName) {
+  console.log(username,repositoryName);
+  return res.status(400).send('Missing username or repository name to subscribe');
+}
+
+  const query = {
+    operation: `
+    MATCH (u:User {username: $username})-[q:subscribes]->(r:Repository {name: $repositoryName})
+    RETURN EXISTS((u)-[:subscribes]->(r)) AS relation;
+    `,
+    parameters: {username, repositoryName}
+
+  };
+  const result = await connectNeo4J(query);
+  if (result.records[0]) {
+    res.status(200).json({ message: 'Subscription exists', message: "Suscrito"});
+  } else {
+    res.status(200).json({ message: 'Subscription exists', message: "No suscrito"});
+  }
+}
+
+
 export const subscribe = async (req, res) => {
   const {username} = req.body
   const {repositoryName} = req.query;
