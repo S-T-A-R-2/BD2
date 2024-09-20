@@ -1,7 +1,21 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useRef} from 'react'
 import { useLocation, useNavigate }  from 'react-router-dom';
-import { createFile, getFiles, getBranches, subscribe, checkSubscription } from '../api/auth.js';
-import { Dropdown, FileBrowser, Button } from '../components/Dropdown.js';
+import { updateBranches, getBranches, subscribe, checkSubscription } from '../api/auth.js';
+import { Dropdown, FileBrowser} from '../components/Dropdown.js';
+import Dialog from '../components/Dialog.jsx'
+
+import {Input, Button} from '../components/Templates.js'
+
+export const ModalCreateBranch = () => {
+	return (
+		<div className='bg-zinc-800 w-[300px] h-[200px] m-auto text-white'>
+			<form>
+				<p>Ingrese el nombre de la nueva rama:</p>
+				<Input placeholder="nombre de la rama"/>
+			</form>
+		</div>
+	)
+}
 
 export const RepositoryPage = () => {
 	const navigate = useNavigate();
@@ -23,6 +37,7 @@ export const RepositoryPage = () => {
 	//notOwner = false : usuario actual es el dueño (desactiva opcion de suscribirse)
 	const [notOwner, setNotOwner] = useState(true);
 	
+	const [branchesDocument, setBranchesDocument] = useState(null);
 
 	useEffect(() => {
 		// Recuperar el nombre de usuario del login	
@@ -37,10 +52,10 @@ export const RepositoryPage = () => {
         const getBranchesAux = async () => {
             if (repository) {
                 try {
-                    const response = await getBranches({ repositoryId: repository._id });
-                    const dataT = response.data;
-                    if (dataT && dataT.branches) {
-                        setBranches(dataT.branches);
+                    const response = (await getBranches({ repositoryId: repository._id })).data;
+                    setBranchesDocument(response);
+                    if (response && response.branches) {
+                        setBranches(response.branches);
                     } else {
                         console.error('Branches not found in the response');
                     }
@@ -75,7 +90,7 @@ export const RepositoryPage = () => {
 		} 
 	}
 
-
+	/******************************Descargar archivos*****************************/
 	const b64toBlob = (b64Data, contentType='', sliceSize=512) => {
 		const byteCharacters = atob(b64Data); // Decodifica el base64
 		const byteArrays = [];
@@ -111,13 +126,14 @@ export const RepositoryPage = () => {
         document.body.removeChild(element);
         URL.revokeObjectURL(element.href);
     }
-	
+	/*****************************************************************************/
+	/**********************************Listas de objetos**************************/
 	// Colocar lista de archivos en la interfaz
 	const FilesList = () => {
 		return (
 			<div class="relative scroll-pb-6 size-[500px]">
 		  	<ul role="list" class="p-2 divide-y divide-slate-100 bg-white text-black">
-			{files.map((file, index) => (
+			{displayedFiles.map((file, index) => (
 			  <li class="group/item flex py-4 first:pt-0 last:pb-0">
 				<div className="w-full cursor-pointer">
 				  	<p class="text-sm font-medium text-slate-900">📂 {file.filename}</p>
@@ -160,13 +176,7 @@ export const RepositoryPage = () => {
 		}
 		
 	}
-
-	// Para mostrar el menú desplegable
-	const [isOpen, setIsOpen] = useState(false);
-	const toggleMenu = () => {
-		setIsOpen(!isOpen);
-	};
-	
+	/*****************************************************************************/
 	const addFilesA = () => {
 		localStorage.setItem('currentBranch', JSON.stringify(actualBranch));
 		localStorage.setItem('repositoryId', JSON.stringify(repository._id));
@@ -183,11 +193,20 @@ export const RepositoryPage = () => {
 		}
 	}
 
+	/**************************Menus de opciones**********************************/
+	// Para mostrar el menú desplegable
+	const [isOpen, setIsOpen] = useState(false);
+	const toggleMenu = () => {
+		setIsOpen(!isOpen);
+	};
 	const menuOptions = [
 		{ label: 'Crear nuevo archivo', link: '#', onClick: () => navigate(`/repository/${repository._id}/CreateFilePage`, {state: {repository : repository}}) },
 		{ label: 'Añadir archivo', link: '#', onClick: () => addFilesA()},
 		{ label: 'Descargar', link: '#', onClick: () =>  downloadFile()},
-		{ label: 'Crear nueva rama', onClick: () => createNewBranch()},
+		{ label: 'Crear nueva rama', onClick: () =>{
+			setDialogContent(<ModalCreateBranch />);
+			toggleDialog();
+		}},
 		{ label: 'Suscribirse', onClick: () => subscribeRepository()}
 	];
 
@@ -203,27 +222,64 @@ export const RepositoryPage = () => {
 		}));
 		setMenuBranchOption(options);
 	}
-	const createNewBranch = () => {
-		const newBranch = {
-			name: "nueva rama",
-			files: [
-			  {
-				filename: "NuevaRama.md",
-				content: "Soy un readme",
-				comments: [
-				  {
-					userId: "567",
-					date: "13-09-2024",
-					description: "Soy un nuevo comentario"
-				  }
-				]
-			  }
-			]
+	/*****************************************************************************/
+	
+
+
+	
+	let displayedFiles = files;
+
+
+	
+	
+	/**************************Crear nueva rama***********************************/
+	const [dialogContent, setDialogContent] = useState(null);
+	const dialogRef = useRef(null);
+	function toggleDialog(){
+		if(!dialogRef.current){
+			return;
 		}
-		setBranches([...branches, newBranch]);
+		dialogRef.current.hasAttribute("open")
+			? dialogRef.current.close()
+			: dialogRef.current.showModal();
+
 	}
 
-	// Interfaz
+	const [newBranchName, setNewBracnhName] = useState(null);
+	const ModalCreateBranch = () => {
+		return (
+			<div>
+				<p>Ingrese el nombre de la nueva rama:</p>
+				<Input placeholder="nombre de la rama"
+						onChange={setNewBracnhName}/>
+			</div>
+		)
+	}
+	const createNewBranch = async () => {
+		if(newBranchName) {
+			const newBranch = {
+				name: newBranchName,
+				files: branches[0].files
+			}
+			setBranches([...branches, newBranch]);
+			branchesDocument.branches = [...branches, newBranch];
+			await updateBranches(branchesDocument, branchesDocument._id);
+			// Crear commit
+		}
+	}
+	//Quitar esto
+	useEffect(()=>{
+		async function updateBranchesAux(){
+			//branchesDocument.branches = branches;
+			console.log(branches);
+        	//await updateBranches(branchesDocument, branchesDocument._id);
+		}
+		if (branches){
+			updateBranchesAux();
+		}
+	}, [branches])
+	/*****************************************************************************/
+	/***********************************Interfaz**********************************/
 	const mergeText = `merge ${branch.name} to master`
 	return (
 		<div className='relative text-white bg-zinc-800 flex flex-col m-auto h-screen'>
@@ -244,19 +300,33 @@ export const RepositoryPage = () => {
 				</div>
 				)}
             </div>
-
 			{(
-				(subscribed=="Suscrito" || notOwner == false) && <div className = "relative top-[100px] flex flex-row">
-				<Dropdown buttonText="Opciones" action={toggleMenu} isActive={isOpen} options={menuOptions}/>
-				<Dropdown buttonText="Ramas" action={toggleBranchMenu} isActive={isOpenBranchMenu} options={menuBranchOptions}/>
-				<></>
+			(subscribed=="Suscrito" || notOwner == false) && 
+			<div className = "relative top-[100px] flex flex-row">
+				<Dropdown 
+					buttonText="Opciones" 
+					action={toggleMenu} 
+					isActive={isOpen} options={menuOptions}
+				/>
+				<Dropdown 
+					buttonText="Ramas" 
+					action={toggleBranchMenu} 
+					isActive={isOpenBranchMenu} options={menuBranchOptions}
+				/>
 				<div className='flex'>
-					<Button text="historial de commits" onClick={e => console.log("Hola")}/>
-					<Button text={mergeText} onClick={e => console.log("Hola")}/>					
+					<Button 
+						text="historial de commits" 
+						onClick={e => console.log("Hola")}
+					/>
+					<Button 
+						text={mergeText} 
+						onClick={e => console.log("Hola")}
+					/>					
 					<input type="text" className='text-black' placeholder='Mensaje de commit'/>
 				</div>
 			</div>
 			)}
+			
 			
 			<div class="relative bg-zinc-800 left-[50px] rounded-md flex flex-row m-auto">
 				<div class="relative bg-zinc-800 rounded-md flex flex-col m-auto">
@@ -268,8 +338,16 @@ export const RepositoryPage = () => {
 					<CommentsList/>
 				</div>
 			</div>
-			
+
+			<Dialog 
+				toggleDialog={toggleDialog}
+				ref={dialogRef}
+				action={() => {createNewBranch(); toggleDialog();}}
+			>
+				{dialogContent}
+			</Dialog>
 	  </div>
+	  /*****************************************************************************/
 	);
 }
 export default RepositoryPage

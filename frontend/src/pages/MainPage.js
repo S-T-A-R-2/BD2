@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useInsertionEffect} from 'react'
-import { Button,TextField } from '../components/pruebas.js';
+import { Button,TextField } from '../components/Templates.js';
 import { useAuth } from '../context/AuthContext';
 import {useNavigate} from 'react-router-dom'
 

@@ -1,8 +1,5 @@
-import logo from './logo.svg';
 import './App.css';
-//Importo la cosa para poder usar los componentes que puse ahí
 import { BrowserRouter as Router, Link, Routes, Route, BrowserRouter } from 'react-router-dom';
-import { Button,TextField } from './components/pruebas.js';
 import {AuthProvider} from './context/AuthContext.jsx'
 
 import LoginPage from './pages/LoginPage.jsx';
