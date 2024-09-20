@@ -105,6 +105,7 @@ export const AddFilesPage = () => {
         }
     }
 
+    const [newFilesCommit, setNewFilesCommit] = useState(false);
     /* Revisa cuales archivos ya se encuentran en la base de datos*/
     useEffect(() => {
         if (filesContent.length > 0) {
@@ -117,13 +118,18 @@ export const AddFilesPage = () => {
                     file.version = file.version + 1;
                 }
             })
-            /* Hace la estructura del commit para cada archivo*/
+            setNewFilesCommit(prev => !prev);
+        }
+    }, [filesContent, branches]);
+    /* Hace la estructura del commit para cada archivo*/
+    useEffect(() => {
+        if (newFilesCommit){
             filesContent.forEach(file => {
                 preCommit(null, file);
             });
+            setNewFilesCommit(prev => !prev);
         }
-
-    }, [filesContent, branches])
+    }, [newFilesCommit]);
 
     /* Guarda el archivo y hace el commit a la base de datos CouchDB */
     const commitAction = async () => {

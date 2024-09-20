@@ -1,10 +1,8 @@
 import {couchDBCommit} from '../db.js'
 
 export const createCommits = async (req, res) => {
-    console.log(req.body);
     const response = await couchDBCommit.insert(req.body);
     res.json(response);
-    
 }
 
 export const getCommits = async (req, res) => {

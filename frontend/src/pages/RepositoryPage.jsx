@@ -29,7 +29,6 @@ export const RepositoryPage = () => {
 		const storedUsername = localStorage.getItem('user');
 		if (storedUsername) {
 			setUsername(JSON.parse(storedUsername));
-			console.log('Username:', JSON.parse(storedUsername));
 			localStorage.removeItem('loggedIn');
 		}
 	}, []);
@@ -140,7 +139,6 @@ export const RepositoryPage = () => {
 
 	const CommentsList = () => {
 		if (files.length > 0) {
-			console.log(files[currentFile].comments);
 			return (
 				<div class="relative scroll-pb-6 size-[500px]">
 				  <ul role="list" class="p-6 divide-y divide-slate-100 bg-white text-black">

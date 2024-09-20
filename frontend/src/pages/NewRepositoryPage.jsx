@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import {useForm} from 'react-hook-form'
-import { createRepository, createRepoNeo, createBranches, getRepository } from '../api/auth';
+import { createRepository, createRepoNeo, createBranches, getRepository, createCommits} from '../api/auth';
 import {TagsInput}  from 'react-tag-input-component';
 import '../reactTags.css';
 import { useAuth } from '../context/AuthContext';
@@ -29,10 +29,12 @@ function NewRepositoryPage() {
         
         try {
             await createRepository(rep);
-            await createRepoNeo(rep);  
-            const response = await getRepository({ owner: user.username, name: nameR });
+            console.log("Entra")
+            await createRepoNeo(rep);
+            console.log("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
+            const response = (await getRepository({ owner: user.username, name: nameR })).data[0];
             const Branch = {
-                _id: response.data[0]._id.toString(),
+                _id: response._id.toString(),
                 branches: [
                   {
                     name: "master",
@@ -52,8 +54,15 @@ function NewRepositoryPage() {
                   }
                 ]
             };
-            await createBranches(Branch, response.data._id);
-            console.log(response.data);
+
+            const initialCommitId = response.owner + "/" + response.name + "/" + Branch.branches[0].name;
+            const initialCommit = {
+                _id : initialCommitId,
+                files : []
+            }
+            console.log(response._id);
+            await createBranches(Branch, response._id);
+            await createCommits(initialCommit, response._id);
         } catch (error) {
             console.error('Error:', error);
         }

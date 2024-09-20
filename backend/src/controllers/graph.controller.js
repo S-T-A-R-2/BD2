@@ -51,7 +51,7 @@ export const createRepository = async (req, res) => {
     const result = await connectNeo4J(operation);
     const userNode = result.records[0].get('u');
     const repositoryNode = result.records[0].get('r');
-    res.status(200).json({ message: 'Repository created and relationship OWNS established', user: userNode, repository: repositoryNode });
+    res.json({ message: 'Repository created and relationship OWNS established', user: userNode, repository: repositoryNode });
   } catch (err) {
     console.error(`Error creating repository and relationship: ${err}`);
     res.status(500).json({ error: 'Error creating repository and relationship', details: err.message });
