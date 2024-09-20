@@ -19,6 +19,7 @@ export const RepositoryPage = () => {
 	const [currentFile, setCurrentFile] = useState(0);
 	const location = useLocation();
   	const [user, setUser] = useState(location.state ? location.state.user : null);
+	const [subscribed, setSubscribed] = useState(" ");
 
 	useEffect(() => {
 		// Recuperar el nombre de usuario del login	
@@ -159,7 +160,9 @@ export const RepositoryPage = () => {
 
 	const subscribeRepository = () => {
 		console.log("FRont: ", user.username, repository.name);
-		subscribe(user.username, repository.name, repository._id);
+		subscribe(user.username, repository.name, repository._id).then(function(res) {
+			setSubscribed(res.data.message);
+		});
 	}
 
 	const menuOptions = [
@@ -216,9 +219,14 @@ export const RepositoryPage = () => {
 				<p class="text-[20px]">Rama actual: {branch.name}</p>
 				<h2>Usuario: {username}</h2>
 				<p>{repository.description}</p>
+				<p>{subscribed}</p>
+				<div style={{marginLeft: '200px'}}>
+					<Button text="Suscribirse" onClick={subscribeRepository}/>
+				</div>
             </div>
 
-			<div className = "relative top-[100px] flex flex-row">
+			{(
+				subscribed=="Suscrito" && <div className = "relative top-[100px] flex flex-row">
 				<Dropdown buttonText="Opciones" action={toggleMenu} isActive={isOpen} options={menuOptions}/>
 				<Dropdown buttonText="Ramas" action={toggleBranchMenu} isActive={isOpenBranchMenu} options={menuBranchOptions}/>
 				<></>
@@ -228,7 +236,7 @@ export const RepositoryPage = () => {
 					<input type="text" className='text-black' placeholder='Mensaje de commit'/>
 				</div>
 			</div>
-			
+			)}
 			
 			<div class="relative bg-zinc-800 left-[50px] rounded-md flex flex-row m-auto">
 				<div class="relative bg-zinc-800 rounded-md flex flex-col m-auto">
