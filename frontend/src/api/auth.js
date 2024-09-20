@@ -34,6 +34,9 @@ export const subscribe = (username, repositoryName, repositoryId) => axios.post(
   params: {repositoryName}
 })
 
+export const checkSubscription = (username, repositoryName, repositoryId) => axios.put(`/repository/${repositoryId}`,{username}, {
+  params: {repositoryName}
+})
 
 /* commits */
 export const createCommits = (commits, repositoryId) => axios.post(`/repositories/${repositoryId}/commits`, commits);

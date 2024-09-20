@@ -9,7 +9,6 @@ import graphRoutes from './routes/graph.route.js'
 import commitsRoutes from './routes/commit.route.js'
 import cors from 'cors';
 import {connectDB} from './db.js'
-import bodyParser from 'body-parser'
 connectDB();
 
 
@@ -22,7 +21,6 @@ app.use(cors({
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(bodyParser.json());
 
 
 app.use("/api", repositoriesRoutes);
