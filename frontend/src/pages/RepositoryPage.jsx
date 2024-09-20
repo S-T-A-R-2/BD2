@@ -65,7 +65,7 @@ export const RepositoryPage = () => {
 
 	//Revisa si el usuario esta suscrito
 	const check = () => { 
-		if (!user.username.localeCompare(repository.owner)) {
+		if (user && !user.username.localeCompare(repository.owner)) {
 			console.log("NO OUNER");
 			setNotOwner(false);
 		} else 
