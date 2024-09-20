@@ -33,3 +33,13 @@ export const updateBranches = (branches, id) => axios.put(`/repositories/${id}/c
 export const subscribe = (username, repositoryName, repositoryId) => axios.post(`/repository/${repositoryId}`,{username}, {
   params: {repositoryName}
 })
+
+
+/* commits */
+export const createCommits = (commits, repositoryId) => axios.post(`/repositories/${repositoryId}/commits`, commits);
+export const updateCommits = (commits, repositoryId, commitsId) => axios.put(`/repositories/${repositoryId}/commits`, commits, {
+  params: {commitsId}
+});
+export const getCommits = (id, repositoryId) => axios.get(`/repositories/${repositoryId}/commits`, {
+  params: {id}
+});

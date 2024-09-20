@@ -18,7 +18,7 @@ export const redisClient = await client.connect();
 const couch = nano('http://admin:con123@127.0.0.1:5984');
 //test es el nombre de la base de datos
 export const couchClient = await couch.db.use('test');
-
+export const couchDBCommit = await couch.db.use('commits');
 
 
 //MongoDB
