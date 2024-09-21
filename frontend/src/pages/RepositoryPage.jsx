@@ -49,24 +49,27 @@ export const RepositoryPage = () => {
 	}, []);
 
 	useEffect(() => {
-        const getBranchesAux = async () => {
-            if (repository) {
-                try {
-                    const response = (await getBranches({ repositoryId: repository._id })).data;
-                    setBranchesDocument(response);
-                    if (response && response.branches) {
-                        setBranches(response.branches);
-                    } else {
-                        console.error('Branches not found in the response');
-                    }
-                } catch (error) {
-                    console.error('Error fetching branches:', error);
-                }
-            }
-        };
-        getBranchesAux();
-    }, [repository]);
-
+		const getBranchesAux = async () => {
+			if (repository) {
+				try {
+					console.log('Repository ID:', repository._id); // Log the repository ID
+					const response = (await getBranches({ repositoryId: repository._id })).data;
+					
+					setBranchesDocument(response);
+					if (response && response.branches) {
+						console.log('Branches fetched:', response.branches); // Log the branches
+						setBranches(response.branches);
+					} else {
+						console.error('Branches not found in the response');
+					}
+				} catch (error) {
+					console.error('Error fetching branches:', error);
+				}
+			}
+		};
+		getBranchesAux();
+	}, [repository]);
+	
 	useEffect(() => {
 		if (branches) {
 			const current = branches[actualBranch];
@@ -130,28 +133,35 @@ export const RepositoryPage = () => {
 	/**********************************Listas de objetos**************************/
 	// Colocar lista de archivos en la interfaz
 	const FilesList = () => {
+		const navigate = useNavigate();
+
+		const handleFileClick = (file) => {
+			console.log(file);
+			navigate(`/repository/${repository._id}/FilePage`, {state: {file}});
+		};
+
 		return (
-			<div class="relative scroll-pb-6 size-[500px]">
-		  	<ul role="list" class="p-2 divide-y divide-slate-100 bg-white text-black">
-			{displayedFiles.map((file, index) => (
-			  <li class="group/item flex py-4 first:pt-0 last:pb-0">
-				<div className="w-full cursor-pointer">
-				  	<p class="text-sm font-medium text-slate-900">📂 {file.filename}</p>
-				</div>
-				<div class="flex flex-col">
-					<a class="text-sm group/edit invisible hover:bg-slate-200 group-hover/item:visible" onClick={e => downloadFile(file)}>
-						<button>Descargar</button>
-					</a>
-					<a class="text-sm invisible hover:bg-slate-100 group-hover/item:visible">
-						<button onClick={e => setCurrentFile(index)}>comentarios</button>
-					</a>
-				</div>
-			  </li>
-			))}
-		  	</ul>
+			<div className="relative scroll-pb-6 size-[500px]">
+				<ul role="list" className="p-2 divide-y divide-slate-100 bg-white text-black">
+					{displayedFiles.map((file, index) => (
+						<li key={index} className="group/item flex py-4 first:pt-0 last:pb-0">
+							<div className="w-full cursor-pointer" onClick={() => handleFileClick(file)}>
+								<p className="text-sm font-medium text-slate-900">📂 {file.filename}</p>
+							</div>
+							<div className="flex flex-col">
+								<a className="text-sm group/edit invisible hover:bg-slate-200 group-hover/item:visible" onClick={e => downloadFile(file)}>
+									<button>Descargar</button>
+								</a>
+								<a className="text-sm invisible hover:bg-slate-100 group-hover/item:visible">
+									<button onClick={e => setCurrentFile(index)}>comentarios</button>
+								</a>
+							</div>
+						</li>
+					))}
+				</ul>
 			</div>
-		)
-	}
+		);
+	};
 
 	const CommentsList = () => {
 		if (files.length > 0) {

@@ -250,9 +250,8 @@ if (!username || !repositoryName) {
   }
     
   }
-
 export const createTags = async (req, res) => {
-  const {tags, owner, repo} = req.body;
+  const { tags, owner, repo } = req.body;
 
   const operation = {
     operation: `
@@ -262,17 +261,17 @@ export const createTags = async (req, res) => {
       MERGE (t)-[:CATEGORIZES]->(r)
       RETURN u,t,r
     `,
-    parameters: { tags, owner, repo}
+    parameters: { tags, owner, repo }
   };
-  
+
   try {
-      const result = await connectNeo4J(operation);
-      res.status(200).json({ message: 'Subscription made', message: message});
-    } catch (err) {
-      console.error(`Error subscribing to the repository: ${err}`);
-      res.status(500).json({ error: 'Error subscribing to the repository: ', details: err.message });
+    const result = await connectNeo4J(operation);
+    res.status(200).json({ message: 'Tags created and associated with the repository successfully', result: result });
+  } catch (err) {
+    console.error(`Error creating tags and associating with the repository: ${err}`);
+    res.status(500).json({ error: 'Error creating tags and associating with the repository', details: err.message });
   }
- };
+};
 
 export const getRecommendations = async (req, res) => {
   const {username} = req.query;

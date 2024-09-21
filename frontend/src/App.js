@@ -11,6 +11,7 @@ import { RepositoryPage } from './pages/RepositoryPage.jsx';
 import CreateFilePage from './pages/CreateFilePage.jsx';
 import ProtectedRoute from './pages/ProtectedRoutes.jsx'
 import AddFilesPage from './pages/AddFilesPage.jsx';
+import FilePage from './pages/FilePage.jsx';
 
 /*<div>
           <Link to="/main">MainWindow</Link>
@@ -29,6 +30,7 @@ function App() {
             <Route path="/repository/:id" element = {<RepositoryPage/>}/>
             <Route path="/repository/:id/CreateFilePage" element = {<CreateFilePage/>}/>
             <Route path="/repository/:id/AddFilePage" element = {<AddFilesPage/>}/>
+            <Route path="/repository/:id/FilePage" element = {<FilePage/>}/>
             <Route element={<ProtectedRoute />}>
               <Route path="/newRepository" element = {<NewRepositoryPage />} />
             </Route>
