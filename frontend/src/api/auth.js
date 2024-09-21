@@ -1,7 +1,16 @@
 import axios from './axios';
 
 //const API = 'http://localhost:5000/api'
+
 export const getRecommendations = (username) => axios.get('/get-reco',{ params: username });
+
+export const getLiked = (req) => axios.get('/get-liked', {params: req});
+export const getDisliked = (req) => axios.get('/get-disiked',{params: req});
+export const makeLike = (req) => axios.post('/make-like', req);
+export const unmakeLike = (req) => axios.post('/unmake-like', req);
+export const makeDislike = (req) => axios.post('/make-dislike', req);
+export const unmakeDislike = (req) => axios.post('/unmake-dislike', req);
+export const getVotes = (req) => axios.get('/get-votes', {params: req}); 
 
 export const createTagsNeo = (repo) => axios.post('/create-tag', repo);
 

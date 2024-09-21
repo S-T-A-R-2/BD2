@@ -1,4 +1,5 @@
 import { connectNeo4J, connectNeo4JRead } from '../db.js';
+import neo4j from 'neo4j-driver';
 
 
 // Create a user node
@@ -301,4 +302,174 @@ export const getRecommendations = async (req, res) => {
       console.error(`Error getting recomendations: ${err}`);
       res.status(500).json({ error: 'Error getting recomendations: ', details: err.message });
   }
-}
+};
+
+export const makeLike = async (req, res) => {
+  const {username, repoName, ownerName} = req.body;
+    
+  const operation = {
+    operation: `
+    MATCH (o:User {username:$ownerName})-[:OWNS]->(r:Repository {name:$repoName}) 
+    MATCH (u:User {username:$username}) 
+    MERGE (u)-[:LIKES]->(r)
+    WITH u,r
+    OPTIONAL MATCH (u)-[d:DISLIKES]->(r)
+    DELETE d
+    RETURN u,r
+    `,
+    parameters: { username, repoName, ownerName }
+  };
+
+  try {
+    const result = await connectNeo4J(operation);
+    res.status(200).json({ message: 'Like made'}); 
+  } catch (err) {
+      console.error(`Error while making like/dislike operations: ${err}`);
+      res.status(500).json({ error: 'Error while making like/dislike operations: ', details: err.message });
+  }
+};
+
+export const unmakeLike = async (req, res) => {
+  const {username, repoName, ownerName} = req.body;
+  
+  const operation = {
+    operation: `
+    MATCH (o:User {username:$ownerName})-[:OWNS]->(r:Repository {name:$repoName}) 
+    MATCH (u:User {username:$username}) 
+    MATCH (u)-[l:LIKES]->(r)
+    DELETE l
+    RETURN u,r
+    `,
+    parameters: { username, repoName, ownerName }
+  };
+
+  try {
+    const result = await connectNeo4J(operation);
+    res.status(200).json({ message: 'Like un-made'}); 
+  } catch (err) {
+      console.error(`Error while making like/dislike operations: ${err}`);
+      res.status(500).json({ error: 'Error while making like/dislike operations: ', details: err.message });
+  }
+};
+
+export const makeDislike = async (req, res) => {
+  const {username, repoName, ownerName} = req.body;
+  
+  const operation = {
+    operation: `
+    MATCH (o:User {username:$ownerName})-[:OWNS]->(r:Repository {name:$repoName}) 
+    MATCH (u:User {username:$username})  
+    MERGE (u)-[:DISLIKES]->(r)
+    WITH u,r
+    OPTIONAL MATCH (u)-[l:LIKES]->(r)
+    DELETE l
+    RETURN u,r
+    `,
+    parameters: { username, repoName, ownerName }
+  };
+
+  try {
+    const result = await connectNeo4J(operation);
+    res.status(200).json({ message: 'Dislike made'}); 
+  } catch (err) {
+      console.error(`Error while making like/dislike operations: ${err}`);
+      res.status(500).json({ error: 'Error while making like/dislike operations: ', details: err.message });
+  }
+};
+
+export const unmakeDislike = async (req, res) => {
+  const {username, repoName, ownerName} = req.body;
+  
+  const operation = {
+    operation: `
+    MATCH (o:User {username:$ownerName})-[:OWNS]->(r:Repository {name:$repoName}) 
+    MATCH (u:User {username:$username}) 
+    MATCH (u)-[d:DISLIKES]->(r)
+    DELETE d
+    RETURN u,r
+    `,
+    parameters: { username, repoName, ownerName }
+  };
+
+  try {
+    const result = await connectNeo4J(operation);
+    res.status(200).json({ message: 'Disike un-made'}); 
+  } catch (err) {
+      console.error(`Error while making like/dislike operations: ${err}`);
+      res.status(500).json({ error: 'Error while making like/dislike operations: ', details: err.message });
+  }
+};
+
+export const getDisliked = async (req, res) => {
+  const {username, repoName, ownerName} = req.query;
+
+  const query = {
+    operation: `
+      MATCH (o:User {username:$ownerName})-[:OWNS]->(r:Repository {name:$repoName}) 
+      MATCH (u:User {username:$username}) 
+      MATCH (u)-[d:DISLIKES]->(r)
+      RETURN d
+    `,
+    parameters: { username, repoName, ownerName }
+  };
+
+  try {
+    const result = await connectNeo4J(query);
+    const disliked = result.records.length > 0;
+    res.status(200).json({ message: 'disliked retrieved', disliked }); 
+  } catch (err) {
+      console.error(`Error getting disliked: ${err}`);
+      res.status(500).json({ error: 'Error getting disliked: ', details: err.message });
+  }
+};
+
+export const getLiked = async (req, res) => {
+  const {username, repoName, ownerName} = req.query;
+
+  const query = {
+    operation: `
+      MATCH (o:User {username:$ownerName})-[:OWNS]->(r:Repository {name:$repoName}) 
+      MATCH (u:User {username:$username}) 
+      MATCH (u)-[l:LIKES]->(r)
+      RETURN l
+    `,
+    parameters: { username, repoName, ownerName }
+  };
+
+  try {
+    const result = await connectNeo4J(query);
+    const liked = result.records.length > 0;
+    res.status(200).json({ message: 'liked retrieved', liked }); 
+  } catch (err) {
+      console.error(`Error getting liked: ${err}`);
+      res.status(500).json({ error: 'Error getting liked: ', details: err.message });
+  }
+};
+
+export const getVotes = async (req, res) => {
+  const { ownerName, repoName } = req.query;
+
+  const query = {
+    operation: `
+      MATCH (o:User)-[:OWNS]->(r:Repository {name: $repoName})
+      MATCH (a:User)-[:LIKES]->(r)
+      WITH COUNT(a) AS likeCount
+      MATCH (b:User)-[:DISLIKES]->(r)
+      WITH likeCount, COUNT(b) AS dislikeCount
+      RETURN (likeCount - dislikeCount) AS voteDifference
+    `,
+    parameters: { repoName }
+  };
+
+  try {
+    const result = await connectNeo4J(query);
+    const voteDifference = result.records.length > 0 ? result.records[0].get('voteDifference') : 0;
+    const final = neo4j.int(voteDifference).toNumber();
+
+    res.status(200).json({ message: 'Vote difference retrieved', final});
+  } catch (err) {
+      console.error(`Error getting vote difference: ${err}`);
+      res.status(500).json({ error: 'Error getting vote difference: ', details: err.message });
+  }
+};
+

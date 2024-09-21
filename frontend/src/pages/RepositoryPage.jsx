@@ -1,6 +1,8 @@
 import React, {useState, useEffect, useRef} from 'react'
 import { useLocation, useNavigate }  from 'react-router-dom';
-import { updateBranches, getBranches, subscribe, checkSubscription, getCommits, createCommits } from '../api/auth.js';
+import { updateBranches, getBranches, subscribe, checkSubscription,
+         getCommits, createCommits, makeLike, unmakeLike, makeDislike,
+         unmakeDislike, getLiked, getDisliked, getVotes } from '../api/auth.js';
 import { Dropdown, FileBrowser} from '../components/Dropdown.js';
 import Dialog from '../components/Dialog.jsx'
 
@@ -17,6 +19,85 @@ export const ModalCreateBranch = () => {
 	)
 }
 
+const LikeDislikeButtons = ({ user, repository }) => {
+  const [isLiked, setIsLiked] = useState(false);
+  const [isDisliked, setIsDisliked] = useState(false);
+  const [votes, setVotes] = useState(0);
+  const parameters = {username: user.username, repoName: repository.name, ownerName: repository.owner}; 
+
+  useEffect( () => {
+    const fetchLikeDislikeStatus = async () => {
+      try {
+        const likedResponse = await getLiked(parameters);
+        const dislikedResponse = await getDisliked(parameters);
+
+        setIsLiked(likedResponse.data.liked);
+        setIsDisliked(dislikedResponse.data.disliked);
+      } catch (error) {
+        console.error('Error fetching like/dislike status:', error);
+      }
+    };
+
+    const fetchVotes = async () =>{
+      try{
+        const ammount = await getVotes(parameters);
+        console.log(ammount);
+        setVotes(ammount.data.final);
+      } catch (err) {
+        console.log('Error fetching votes', err);
+      }
+    }
+    
+    fetchVotes();
+    fetchLikeDislikeStatus();
+  }, [user, repository]);
+  
+  const handleMakeLike = async () => {
+    setIsLiked(true);
+    setIsDisliked(false);
+    await makeLike(parameters);
+  };
+
+  const handleUnmakeLike = async () => {
+    setIsLiked(false);
+    await unmakeLike(parameters);
+  };
+
+  const handleMakeDislike = async () => {
+    setIsDisliked(true);
+    setIsLiked(false);
+    await makeDislike(parameters);
+  };
+
+  const handleUnmakeDislike = async () => {
+    setIsDisliked(false);
+    await unmakeDislike(parameters);
+  };
+
+  return (
+    <div className="relative flex flex-row space-x-2">
+      <button
+        onClick={isLiked ? handleUnmakeLike : handleMakeLike}
+        className={`px-4 py-2 rounded transition duration-200 ${
+          isLiked ? 'bg-blue-600 text-white' : 'bg-gray-300 text-black'
+        } hover:bg-blue-500`}
+      >
+        {isLiked ? 'Unlike' : 'Like'}
+      </button>
+      <button
+        onClick={isDisliked ? handleUnmakeDislike : handleMakeDislike}
+        className={`px-4 py-2 rounded transition duration-200 ${
+          isDisliked ? 'bg-red-600 text-white' : 'bg-gray-300 text-black'
+        } hover:bg-red-500`}
+      >
+        {isDisliked ? 'Remove Dislike' : 'Dislike'}
+      </button>
+      <p className="inline px-4 py-2">{votes}</p>
+    </div>
+  );
+};
+
+
 export const RepositoryPage = () => {
 	const navigate = useNavigate();
 	const [username, setUsername] = useState(null);
@@ -32,7 +113,7 @@ export const RepositoryPage = () => {
 	const [actualBranch, setActualBranch] = useState(0);
 	const [currentFile, setCurrentFile] = useState(0);
 	const location = useLocation();
-  	const [user, setUser] = useState(location.state ? location.state.user : null);
+  const [user, setUser] = useState(location.state ? location.state.user : null);
 	const [subscribed, setSubscribed] = useState(" ");
 	//notOwner = false : usuario actual es el dueño (desactiva opcion de suscribirse)
 	const [notOwner, setNotOwner] = useState(true);
@@ -335,8 +416,9 @@ export const RepositoryPage = () => {
 				</div>
 			</div>
 			)}
-			
-			
+
+      {( (user && repository) && <LikeDislikeButtons user = {user} repository={repository}/> )}
+
 			<div class="relative bg-zinc-800 left-[50px] rounded-md flex flex-row m-auto">
 				<div class="relative bg-zinc-800 rounded-md flex flex-col m-auto">
 					<h1>Archivos</h1>
