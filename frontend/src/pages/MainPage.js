@@ -2,6 +2,7 @@ import React, {useState, useEffect, useInsertionEffect} from 'react'
 import { Button,TextField } from '../components/pruebas.js';
 import { useAuth } from '../context/AuthContext';
 import {useNavigate} from 'react-router-dom'
+import { getRecommendations } from '../api/auth.js';
 
 export const MainPage = () => {
 	//const [username, setUsername] = useState("Página principal");
@@ -10,10 +11,21 @@ export const MainPage = () => {
 	const { isAuthenticated, logout, user } = useAuth();
 	const navigate = useNavigate();
     useEffect(() => {
-        if (isAuthenticated && user) {
-            setUsername(user.username);
-            setPassword(user.password);
+      const fetchRecommendations = async (userName) => {
+        try {
+          const recommendations = await getRecommendations({ username: userName });
+          console.log(recommendations); 
+        } catch (error) {
+          console.error('Error fetching recommendations:', error);
         }
+      };
+
+        
+      if (isAuthenticated && user) {
+        setUsername(user.username);
+        setPassword(user.password);
+        fetchRecommendations(user.username);      
+      } 
     }, [isAuthenticated, user]);
 
 	const handleLogout = () => {
@@ -21,9 +33,11 @@ export const MainPage = () => {
 		window.location.reload();
 	}
 
+
+
 return (
 	<div className='text-white bg-zinc-800 flex  flex-col m-auto h-screen'>
-		<h1 className="text-4xl">Página principal</h1>
+		<h1 className="text-4xl">Página principal 🏠</h1>
 
 		<h1 className= "text-3xl">Usuario: {username}</h1>
  
@@ -65,7 +79,6 @@ return (
 		<br/>
 		<div>
 
-		<h1 className='text-white text-4xl'>Repositorios</h1>
 			<ul class="list-style-none" data-filterable-for="dashboard-repos-filter-left" data-filterable-type="substring">
 				<li class="private source no-description">
 					<div class="width-full d-flex mt-2">
@@ -79,8 +92,12 @@ return (
 					</div>
 				</li>
 			</ul>
+
+    <h1 className='text-white text-3xl'>Recomendaciones 🗂️</h1>
+        
 		  </div>
-	</div>)}
+	  </div>)
+  }
 
   </div>
 
