@@ -2,38 +2,78 @@ import React, {useState, useEffect, useInsertionEffect} from 'react'
 import { Button,TextField } from '../components/Templates.js';
 import { useAuth } from '../context/AuthContext';
 import {useNavigate} from 'react-router-dom'
-import { getRecommendations } from '../api/auth.js';
+import { getRecommendations, getRepository } from '../api/auth.js';
+
+const RecoTag = ({ recommendations }) => {
+    const navigate = useNavigate();
+
+    if (!recommendations || recommendations.length == 0) {
+      return (
+        <div>
+          <h1 className='text-white text-3xl'>Recomendaciones 🗂️</h1>
+          <p>No hay recomendaciones</p>;
+        </div>
+      );
+    }
+    
+    const handleRepositoryClick = async (ownerP, nameP) => {
+      try {
+        const repository = await getRepository({owner:ownerP, name:nameP});
+        navigate(`/repository/${repository.data[0]._id}`);
+      } catch (error) {
+        console.error('Error fetching repository:', error);
+      }
+    };
+
+    return (
+      <div>
+        <h1 className='text-white text-3xl'>Recomendaciones 🗂️</h1>
+        <ul>
+          {recommendations.map(({ repo, owner }, index) => (
+            <li key={index}>
+              <a  href="#"
+                onClick={(e) => {
+                  handleRepositoryClick(owner.properties.username, repo.properties.name);
+                }}
+              >
+                {`${owner.properties.username}/${repo.properties.name}`}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  };
 
 export const MainPage = () => {
 	//const [username, setUsername] = useState("Página principal");
 	const [username, setUsername] = useState(null);
 	const [password, setPassword] = useState(null);
+  const [recommendations,setRecos] = useState([]);
 	const { isAuthenticated, logout, user } = useAuth();
 	const navigate = useNavigate();
     useEffect(() => {
       const fetchRecommendations = async (userName) => {
         try {
-          const recommendations = await getRecommendations({ username: userName });
-          console.log(recommendations); 
+          const recos = await getRecommendations({ username: userName });
+          setRecos(recos.data.recommendations); 
+          
         } catch (error) {
           console.error('Error fetching recommendations:', error);
         }
       };
-
         
       if (isAuthenticated && user) {
         setUsername(user.username);
         setPassword(user.password);
         fetchRecommendations(user.username);      
-      } 
+      }
     }, [isAuthenticated, user]);
 
 	const handleLogout = () => {
 		logout();
 		window.location.reload();
 	}
-
-
 
 return (
 	<div className='text-white bg-zinc-800 flex  flex-col m-auto h-screen'>
@@ -52,7 +92,7 @@ return (
 			</a> )}
 			<a href="/login" class="group block w-30 h-25 text-black rounded-lg p-2 bg-white shadow-lg hover:bg-sky-500">					
 				<h3 className="flex space-x-3text-slate-900 group-hover:text-white text-sm font-semibold inline text-center">🚪 Ver perfil</h3>	
-			</a>
+			</a>MainPage
 	
 		</div>
 		
@@ -92,10 +132,11 @@ return (
 					</div>
 				</li>
 			</ul>
-
-    <h1 className='text-white text-3xl'>Recomendaciones 🗂️</h1>
         
 		  </div>
+
+      <RecoTag recommendations={recommendations} />
+
 	  </div>)
   }
 
