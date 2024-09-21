@@ -1,11 +1,12 @@
 import React, {useState, useEffect, useInsertionEffect} from 'react'
 import { Button,TextField } from '../components/Templates.js';
 import { useAuth } from '../context/AuthContext';
-import {useNavigate} from 'react-router-dom'
+import {useNavigate, useLocation} from 'react-router-dom'
 import { getRecommendations, getRepository } from '../api/auth.js';
 
-const RecoTag = ({ recommendations }) => {
+const RecoTag = ({ recommendations,user }) => {
     const navigate = useNavigate();
+    const location = useLocation();
 
     if (!recommendations || recommendations.length == 0) {
       return (
@@ -15,11 +16,19 @@ const RecoTag = ({ recommendations }) => {
         </div>
       );
     }
+
     
     const handleRepositoryClick = async (ownerP, nameP) => {
       try {
-        const repository = await getRepository({owner:ownerP, name:nameP});
-        navigate(`/repository/${repository.data[0]._id}`);
+        const repo = await getRepository({owner:ownerP, name:nameP});
+        const repository = JSON.stringify(repo.data[0]);
+      
+
+        localStorage.setItem('repository', repository);
+        navigate(`/repository/${repository._id}`, {
+          state: { repository: repository, user: user}
+        })
+        
       } catch (error) {
         console.error('Error fetching repository:', error);
       }
@@ -135,7 +144,7 @@ return (
         
 		  </div>
 
-      <RecoTag recommendations={recommendations} />
+      <RecoTag recommendations={recommendations} user={user}/>
 
 	  </div>)
   }
