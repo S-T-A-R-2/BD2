@@ -29,13 +29,11 @@ function NewRepositoryPage() {
         
         try { 
             await createRepository(rep);
-    
             await createRepoNeo(rep);
-    
-            await createTagsNeo({tags: tagsR, owner: user.username, repo: nameR});
-    
+
+            await createTagsNeo({tags:tagsR, owner: user.username, repo: nameR}); 
+
             const response = (await getRepository({ owner: user.username, name: nameR })).data[0];
-    
             const Branch = {
                 _id: response._id.toString(),
                 branches: [
@@ -57,17 +55,15 @@ function NewRepositoryPage() {
                   }
                 ]
             };
-    
+
             const initialCommitId = response.owner + "/" + response.name + "/" + Branch.branches[0].name;
             const initialCommit = {
                 _id : initialCommitId,
                 files : []
             }
-    
+            console.log(response._id);
             await createBranches(Branch, response._id);
-    
-            await createCommits(initialCommit, response._id);
-
+            console.log((await createCommits(initialCommit, response._id)).data);
         } catch (error) {
             console.error('Error:', error);
         }

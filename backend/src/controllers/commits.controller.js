@@ -17,8 +17,8 @@ export const getCommits = async (req, res) => {
 
 export const updateCommits = async (req, res) => {
     const {commitsId} = req.params;
-    console.log(req.body._id);
     const response = await couchDBCommit.insert(req.body, req.body._id);
+    console.log("actualizó");
     console.log(req.body);
-    //res.json(response);
+    res.json(response);
 }

@@ -1,6 +1,8 @@
 import React, {useState, useEffect, useRef} from 'react'
 import { useLocation, useNavigate }  from 'react-router-dom';
-import { updateBranches, getBranches, subscribe, checkSubscription, getCommits, createCommits } from '../api/auth.js';
+import { updateBranches, getBranches, subscribe, checkSubscription,
+         getCommits, createCommits, makeLike, unmakeLike, makeDislike,
+         unmakeDislike, getLiked, getDisliked, getVotes } from '../api/auth.js';
 import { Dropdown, FileBrowser} from '../components/Dropdown.js';
 import Dialog from '../components/Dialog.jsx'
 
@@ -17,6 +19,85 @@ export const ModalCreateBranch = () => {
 	)
 }
 
+const LikeDislikeButtons = ({ user, repository }) => {
+  const [isLiked, setIsLiked] = useState(false);
+  const [isDisliked, setIsDisliked] = useState(false);
+  const [votes, setVotes] = useState(0);
+  const parameters = {username: user.username, repoName: repository.name, ownerName: repository.owner}; 
+
+  useEffect( () => {
+    const fetchLikeDislikeStatus = async () => {
+      try {
+        const likedResponse = await getLiked(parameters);
+        const dislikedResponse = await getDisliked(parameters);
+
+        setIsLiked(likedResponse.data.liked);
+        setIsDisliked(dislikedResponse.data.disliked);
+      } catch (error) {
+        console.error('Error fetching like/dislike status:', error);
+      }
+    };
+
+    const fetchVotes = async () =>{
+      try{
+        const ammount = await getVotes(parameters);
+        console.log(ammount);
+        setVotes(ammount.data.final);
+      } catch (err) {
+        console.log('Error fetching votes', err);
+      }
+    }
+    
+    fetchVotes();
+    fetchLikeDislikeStatus();
+  }, [user, repository]);
+  
+  const handleMakeLike = async () => {
+    setIsLiked(true);
+    setIsDisliked(false);
+    await makeLike(parameters);
+  };
+
+  const handleUnmakeLike = async () => {
+    setIsLiked(false);
+    await unmakeLike(parameters);
+  };
+
+  const handleMakeDislike = async () => {
+    setIsDisliked(true);
+    setIsLiked(false);
+    await makeDislike(parameters);
+  };
+
+  const handleUnmakeDislike = async () => {
+    setIsDisliked(false);
+    await unmakeDislike(parameters);
+  };
+
+  return (
+    <div className="relative flex flex-row space-x-2">
+      <button
+        onClick={isLiked ? handleUnmakeLike : handleMakeLike}
+        className={`px-4 py-2 rounded transition duration-200 ${
+          isLiked ? 'bg-blue-600 text-white' : 'bg-gray-300 text-black'
+        } hover:bg-blue-500`}
+      >
+        {isLiked ? 'Unlike' : 'Like'}
+      </button>
+      <button
+        onClick={isDisliked ? handleUnmakeDislike : handleMakeDislike}
+        className={`px-4 py-2 rounded transition duration-200 ${
+          isDisliked ? 'bg-red-600 text-white' : 'bg-gray-300 text-black'
+        } hover:bg-red-500`}
+      >
+        {isDisliked ? 'Remove Dislike' : 'Dislike'}
+      </button>
+      <p className="inline px-4 py-2">{votes}</p>
+    </div>
+  );
+};
+
+
 export const RepositoryPage = () => {
 	const navigate = useNavigate();
 	const [username, setUsername] = useState(null);
@@ -32,7 +113,7 @@ export const RepositoryPage = () => {
 	const [actualBranch, setActualBranch] = useState(0);
 	const [currentFile, setCurrentFile] = useState(0);
 	const location = useLocation();
-  	const [user, setUser] = useState(location.state ? location.state.user : null);
+  const [user, setUser] = useState(location.state ? location.state.user : null);
 	const [subscribed, setSubscribed] = useState(" ");
 	//notOwner = false : usuario actual es el dueño (desactiva opcion de suscribirse)
 	const [notOwner, setNotOwner] = useState(true);
@@ -115,12 +196,12 @@ export const RepositoryPage = () => {
 	};
 	
 	const downloadFile = async (fileA) => {
-       	const attachment = fileA._attachments[fileA.filename];
+       	const attachment = fileA._attachments[fileA.name];
         const file = b64toBlob(attachment.data, attachment.content_type);
         
 		const element = document.createElement('a');
         element.href = URL.createObjectURL(file);
-        element.download = fileA.filename;
+        element.download = fileA.name;
         
         document.body.appendChild(element);
         element.click();
@@ -276,7 +357,6 @@ export const RepositoryPage = () => {
 			// Crear commit
 			const sourceBranch = {id: repository.owner + "/" + repository.name + "/" + "master"};
 			const sourceBranchCommits = (await getCommits(sourceBranch, repository._id)).data;
-			console.log(sourceBranchCommits);
 			const destinationBranch = repository.owner + "/" + repository.name + "/" + newBranchName;
 			const destinationBranchCommits = {
 				_id : destinationBranch,
@@ -319,7 +399,7 @@ export const RepositoryPage = () => {
 				)}
             </div>
 			{(
-			(subscribed=="Suscrito" || notOwner == false) && 
+			(subscribed === "Suscrito" || notOwner === false) && 
 			<div className = "relative top-[100px] flex flex-row">
 				<Dropdown 
 					buttonText="Opciones" 
@@ -338,14 +418,16 @@ export const RepositoryPage = () => {
 					/>
 					<Button 
 						text={mergeText} 
-						onClick={e => console.log("Hola")}
+						onClick={merge}
+						args={[branch, branches[0]]}
 					/>					
 					<input type="text" className='text-black' placeholder='Mensaje de commit'/>
 				</div>
 			</div>
 			)}
-			
-			
+
+      {( (user && repository) && <LikeDislikeButtons user = {user} repository={repository}/> )}
+
 			<div class="relative bg-zinc-800 left-[50px] rounded-md flex flex-row m-auto">
 				<div class="relative bg-zinc-800 rounded-md flex flex-col m-auto">
 					<h1>Archivos</h1>
@@ -368,4 +450,17 @@ export const RepositoryPage = () => {
 	  /*****************************************************************************/
 	);
 }
+
+function merge (source, destination) {
+	source.files.forEach(file => {
+		const destinationFile = destination.files.find(f => f.filename === file.filename);
+		if (destinationFile && destinationFile.version < file.version) {
+			Object.assign(destinationFile, file);
+		}
+		if (!destinationFile){
+			destination.files = [...destination.files, file];
+		}
+	});	
+}
+
 export default RepositoryPage
