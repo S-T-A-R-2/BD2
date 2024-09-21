@@ -3,6 +3,7 @@ import axios from './axios';
 //const API = 'http://localhost:5000/api'
 
 export const getRecommendations = (username) => axios.get('/get-reco',{ params: username });
+export const getOwnedRepos = (username) => axios.get('/get-owned', {params: username});
 
 export const getLiked = (req) => axios.get('/get-liked', {params: req});
 export const getDisliked = (req) => axios.get('/get-disiked',{params: req});

@@ -41,7 +41,6 @@ const LikeDislikeButtons = ({ user, repository }) => {
     const fetchVotes = async () =>{
       try{
         const ammount = await getVotes(parameters);
-        console.log(ammount);
         setVotes(ammount.data.final);
       } catch (err) {
         console.log('Error fetching votes', err);
@@ -105,7 +104,6 @@ export const RepositoryPage = () => {
 	const [branches, setBranches] = useState(null);
 	const [repository, setRepository] = useState(() => {
         const savedRepository = localStorage.getItem('repository');
-        console.log(savedRepository);
         return savedRepository ? JSON.parse(savedRepository) : null;
     });
 	const [branch, setBranch] = useState("");
