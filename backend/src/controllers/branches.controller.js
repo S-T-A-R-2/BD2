@@ -13,7 +13,6 @@ export const getBranches = async (req, res) => {
     const query = { selector: { _id : repositoryId } }
     const branches = (await couchClient.find(query));
     //branches.docs[0].branches[0].files[3].content = await db.attachment.get(branches.docs[0]._id, files[3].filename);
-    console.log(branches.docs[0].branches[0].files[3]);
     res.json(branches.docs[0]);
 }
 
