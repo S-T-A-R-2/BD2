@@ -29,16 +29,12 @@ function NewRepositoryPage() {
         
         try { 
             await createRepository(rep);
-            console.log('Repository created successfully');
     
             await createRepoNeo(rep);
-            console.log('Repository created in Neo4j successfully');
     
             await createTagsNeo({tags: tagsR, owner: user.username, repo: nameR});
-            console.log('Tags created in Neo4j successfully');
     
             const response = (await getRepository({ owner: user.username, name: nameR })).data[0];
-            console.log('Repository fetched successfully:', response);
     
             const Branch = {
                 _id: response._id.toString(),
@@ -68,14 +64,10 @@ function NewRepositoryPage() {
                 files : []
             }
     
-            console.log('Branch data prepared:', Branch);
-            console.log('Initial commit data prepared:', initialCommit);
-    
             await createBranches(Branch, response._id);
-            console.log('Branches created in CouchDB successfully');
     
             await createCommits(initialCommit, response._id);
-            console.log('Initial commit created in CouchDB successfully');
+
         } catch (error) {
             console.error('Error:', error);
         }

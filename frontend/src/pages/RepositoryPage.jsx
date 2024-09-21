@@ -136,8 +136,7 @@ export const RepositoryPage = () => {
 		const navigate = useNavigate();
 
 		const handleFileClick = (file) => {
-			console.log(file);
-			navigate(`/repository/${repository._id}/FilePage`, {state: {file}});
+			navigate(`/repository/${repository._id}/FilePage`, { state: { file, repository } });
 		};
 
 		return (
