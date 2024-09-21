@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import {useForm} from 'react-hook-form'
-import { createRepository, createRepoNeo, createBranches, getRepository, createCommits} from '../api/auth';
+import { createRepository, createRepoNeo, createBranches, getRepository, createCommits, createTagsNeo} from '../api/auth';
 import {TagsInput}  from 'react-tag-input-component';
 import '../reactTags.css';
 import { useAuth } from '../context/AuthContext';
@@ -27,11 +27,12 @@ function NewRepositoryPage() {
             isPrivate: privateR
         };
         
-        try {
+        try { 
             await createRepository(rep);
-            console.log("Entra")
             await createRepoNeo(rep);
-            console.log("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
+
+            await createTagsNeo({tags:tagsR, owner: user.username, repo: nameR}); 
+
             const response = (await getRepository({ owner: user.username, name: nameR })).data[0];
             const Branch = {
                 _id: response._id.toString(),

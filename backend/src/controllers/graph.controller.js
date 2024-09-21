@@ -247,9 +247,54 @@ if (!username || !repositoryName) {
     } catch (err) {
       console.error(`Error subscribing to the repository: ${err}`);
       res.status(500).json({ error: 'Error subscribing to the repository: ', details: err.message });
-    }
+  }
     
   }
 
+export const createTags = async (req, res) => {
+  const {tags, owner, repo} = req.body;
+
+  const operation = {
+    operation: `
+      MATCH (u:User {username:$owner})-[:OWNS]->(r:Repository {name:$repo})
+      UNWIND $tags AS tagP
+      MERGE (t: Tag {tag:tagP})
+      MERGE (t)-[:CATEGORIZES]->(r)
+      RETURN u,t,r
+    `,
+    parameters: { tags, owner, repo}
+  };
   
-  
+  try {
+      const result = await connectNeo4J(operation);
+      res.status(200).json({ message: 'Subscription made', message: message});
+    } catch (err) {
+      console.error(`Error subscribing to the repository: ${err}`);
+      res.status(500).json({ error: 'Error subscribing to the repository: ', details: err.message });
+  }
+ };
+
+export const getRecommendations = async (req, res) => {
+  const {username} = req.query;
+
+  const query = {
+    operation: `
+      MATCH (u:User {username:$username})-[:subscribes]->(r:Repository)
+      MATCH (t:Tag) -[:CATEGORIZES]-> (r)
+      MATCH (t)-[:CATEGORIZES]-> (e:Repository)
+      WHERE e <> r
+      RETURN DISTINCT e
+      LIMIT 10;
+    `,
+    parameters: { username }
+  };
+
+  try {
+    const result = await connectNeo4J(query);
+    res.status(200).json({ message: 'Recomendations gotten', message: message});
+    console.log(result);
+  } catch (err) {
+      console.error(`Error getting recomendations: ${err}`);
+      res.status(500).json({ error: 'Error getting recomendations: ', details: err.message });
+  }
+}

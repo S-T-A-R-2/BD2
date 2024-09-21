@@ -1,6 +1,9 @@
 import axios from './axios';
 
 //const API = 'http://localhost:5000/api'
+export const getRecommendations = (username) => axios.get('/get-reco',{ params: username });
+
+export const createTagsNeo = (repo) => axios.post('/create-tag', repo);
 
 export const registerRequest = (user) => axios.post(`/register`, user);
 export const createUser = (user) => axios.post('create-user', user);

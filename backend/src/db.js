@@ -15,7 +15,7 @@ export const redisClient = await client.connect();
 
 // CouchDB
 //admin es el nombre de usuario y con123 la contraseña que hayan puesto
-const couch = nano('http://admin:con123@127.0.0.1:5984');
+const couch = nano('http://admin:con123@0.0.1:5984');
 //test es el nombre de la base de datos
 export const couchClient = await couch.db.use('test');
 export const couchDBCommit = await couch.db.use('commits');
@@ -44,28 +44,21 @@ export const connectNeo4J = async (dbOperation) => {
   let driver;
   let session;
   
-  console.log("conectando neo4j");
-
   try {
     driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD));
     await driver.verifyConnectivity();
     
-    console.log("conectado");
-
     session = driver.session({ database: 'neo4j' });
-    console.log("sesion creada");
-    // Destructure operation and parameters from dbOperation
+        // Destructure operation and parameters from dbOperation
     const { operation, parameters } = dbOperation;
     
     // Execute the operation with session.run
     const result = await session.run(operation, parameters);
       
-    console.log("operacion terminada");
-
     return result;
 
   } catch (err) {
-    console.error(`Request error\n${err}\nCause: ${err.cause}`);
+    console.error(`Request error\n${err}`);
     throw err;
   } finally {
     if (session) await session.close();
@@ -78,29 +71,23 @@ export const connectNeo4JRead = async (dbOperation) => {
   const USER = 'neo4j';
   const PASSWORD = process.env.NEO4J_PASSWORD;
   let driver;
-  
-  console.log("conectando neo4j");
 
   try {
     driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD));
-    await driver.verifyConnectivity();
-    
-    console.log("conectado");
+    await driver.verifyConnectivity(); 
 
     const { operation, parameters } = dbOperation;
+    console.log(operation + "\n" + parameters );
 
-    let { records, summary } = await driver.executeQuery({operation, parameters});
+    let { records, summary } = await driver.executeQuery(operation, parameters, {database: 'neo4j'});
     // Destructure operation and parameters from dbOperation
-    
-    
+
     // Execute the operation with session.run
-      
-    console.log("operacion terminada");
 
     return { records, summary };
 
   } catch (err) {
-    console.error(`Request error\n${err}\nCause: ${err.cause}`);
+    console.error(`Request error\n${err}`);
     throw err;
   } finally {
     if (driver) await driver.close();

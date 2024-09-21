@@ -6,7 +6,9 @@ import {createUser,
         createCommentOnRepository,
         createCommentOnComment,
         subscribe,
-        checkSubscription } from '../controllers/graph.controller.js';
+        checkSubscription,
+        createTags,
+        getRecommendations } from '../controllers/graph.controller.js';
    
 
 const router = Router();
@@ -19,5 +21,7 @@ router.post('/create-comment-on-repository', createCommentOnRepository);
 router.post('/create-comment-on-comment', createCommentOnComment);
 router.post('/repository/:id', subscribe);
 router.put('/repository/:id', checkSubscription);
+router.post('/create-tag', createTags);
+router.get('/get-reco', getRecommendations)
 
 export default router;
