@@ -50,6 +50,7 @@ export const AddFilesPage = () => {
                 const base64String = reader.result.split(",")[1];
                 setFilesContent(prev => [...prev,
                 {   filename: file.name,
+                    name: file.name,
                     version: 0,
                     _attachments: {
                         [file.name] : {
@@ -62,6 +63,36 @@ export const AddFilesPage = () => {
         });
         setSelectedFiles(fileArray);
     };
+
+    function handleDirectoryChange(event){
+        const files = event.target.files;
+        const fileArray = Array.from(files);
+        const updatedFilesContent = [];
+
+        fileArray.forEach(file => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const base64String = reader.result.split(",")[1];
+
+                updatedFilesContent.push({
+                    filename: file.webkitRelativePath,
+                    name: file.name,
+                    version: 0,
+                    _attachments: {
+                        [file.name]: {
+                            contentType: file.type,
+                            data: base64String
+                        }
+                    }
+                });
+                if (updatedFilesContent.length === fileArray.length) {
+                    setFilesContent(prev => [...prev, ...updatedFilesContent]);
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+        setSelectedFiles(prev => [...prev, ...fileArray]);
+    }
 
     const [commits, setCommits] = useState([]);
     const [documentCommits, setDocumentCommits] = useState(null)
@@ -80,6 +111,7 @@ export const AddFilesPage = () => {
         }
     }, [repositoryDescription, branches])
 
+    let committs = []
     /* Estructura de cada commit */
     const preCommit = (oldFile, newFile) => {
         if (oldFile) {
@@ -91,14 +123,17 @@ export const AddFilesPage = () => {
             user: user.username,
             version: newFile.version,
             date: currentTime,
-            data: newFile._attachments[newFile.filename].data
+            data: newFile._attachments[newFile.name].data
         };
         const file = {
             filename : newFile.filename,
             commits : [commit]
         }
         if (!oldFile){
-            setCommits(prev => [...prev, file]);
+            committs = [...committs, file];
+            console.log("Crear nuevo commit");
+            console.log(file)
+            console.log("Crear nuevo commit");
         }else{
             const addCommitToFile = (documentCommits.files.find(f => f.filename == newFile.filename))
             addCommitToFile.commits = [...addCommitToFile.commits, commit]
@@ -107,39 +142,40 @@ export const AddFilesPage = () => {
 
     const [newFilesCommit, setNewFilesCommit] = useState(false);
     /* Revisa cuales archivos ya se encuentran en la base de datos*/
-    useEffect(() => {
+    let source;
+    async function searchFiles () {
         if (filesContent.length > 0) {
+            source = [...filesContent];
             branches[current].files.forEach(file => {
-                const updatedFile = (filesContent.find(f => f.filename == file.filename))
+                const updatedFile = (source.find(f => f.filename == file.filename))
                 if (updatedFile){
-                    setFilesContent(filesContent.filter(f => f.filename !== file.filename));
+                    source = source.filter(f => f.filename !== file.filename);
                     preCommit(file, updatedFile);
                     file._attachments.data = updatedFile._attachments.data;
                     file.version = file.version + 1;
                 }
             })
-            setNewFilesCommit(prev => !prev);
         }
-    }, [filesContent, branches]);
+    };
+    //const [addOthers, setAddOthers] = useState(false);
     /* Hace la estructura del commit para cada archivo*/
-    useEffect(() => {
-        if (newFilesCommit){
-            filesContent.forEach(file => {
-                preCommit(null, file);
-            });
-            setNewFilesCommit(prev => !prev);
-        }
-    }, [newFilesCommit]);
+    async function addOthers (){
+        source.forEach(file => {
+            preCommit(null, file);
+        });
+    }
 
     /* Guarda el archivo y hace el commit a la base de datos CouchDB */
     const commitAction = async () => {
-        
+        await searchFiles();
+        await addOthers();
         /* Creación del archivo en la rama y commits */
-        repository.branches[current].files = [...branches[current].files, ...filesContent]
+        repository.branches[current].files = [...branches[current].files, ...source]
         await updateBranches(repository, id);
-        documentCommits.files = [...documentCommits.files, ...commits];
+        documentCommits.files = [...documentCommits.files, ...committs];
         await updateCommits(documentCommits, id, documentCommits._id);
     }
+
     return (
         <div className='relative text-white bg-zinc-800 flex flex-col m-auto h-screen'>
             <p>Hola mundo</p>
@@ -149,16 +185,26 @@ export const AddFilesPage = () => {
 					<label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="multiple_files">
                         Upload multiple files
                     </label>
-                    <input 
-                        class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" 
-                        id="multiple_files" 
-                        type="file" 
-                        multiple
-                        onChange={handleFileChange}
-                    />
+                    <div className='flex flex-row'>
+                        <input 
+                            class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" 
+                            id="multiple_files" 
+                            type="file" 
+                            webkitdirectory="true"
+                            multiple
+                            onChange={handleDirectoryChange}
+                        />
+                        <input 
+                            class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" 
+                            id="multiple_files" 
+                            type="file" 
+                            multiple
+                            onChange={handleFileChange}
+                        />
+                    </div>
                     <ul>
-                        {selectedFiles.map((file, index) => (
-                            <li key={index}>{file.name}</li>
+                        {filesContent.map((file, index) => (
+                            <li key={index}>{file.filename}</li>
                         ))}
                     </ul>
                     <input type="text" className='text-black' placeholder='Mensaje de commit'/>

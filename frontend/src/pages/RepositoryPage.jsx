@@ -112,12 +112,12 @@ export const RepositoryPage = () => {
 	};
 	
 	const downloadFile = async (fileA) => {
-       	const attachment = fileA._attachments[fileA.filename];
+       	const attachment = fileA._attachments[fileA.name];
         const file = b64toBlob(attachment.data, attachment.content_type);
         
 		const element = document.createElement('a');
         element.href = URL.createObjectURL(file);
-        element.download = fileA.filename;
+        element.download = fileA.name;
         
         document.body.appendChild(element);
         element.click();
@@ -267,7 +267,6 @@ export const RepositoryPage = () => {
 			// Crear commit
 			const sourceBranch = {id: repository.owner + "/" + repository.name + "/" + "master"};
 			const sourceBranchCommits = (await getCommits(sourceBranch, repository._id)).data;
-			console.log(sourceBranchCommits);
 			const destinationBranch = repository.owner + "/" + repository.name + "/" + newBranchName;
 			const destinationBranchCommits = {
 				_id : destinationBranch,
@@ -310,7 +309,7 @@ export const RepositoryPage = () => {
 				)}
             </div>
 			{(
-			(subscribed=="Suscrito" || notOwner == false) && 
+			(subscribed === "Suscrito" || notOwner === false) && 
 			<div className = "relative top-[100px] flex flex-row">
 				<Dropdown 
 					buttonText="Opciones" 
@@ -329,7 +328,8 @@ export const RepositoryPage = () => {
 					/>
 					<Button 
 						text={mergeText} 
-						onClick={e => console.log("Hola")}
+						onClick={merge}
+						args={[branch, branches[0]]}
 					/>					
 					<input type="text" className='text-black' placeholder='Mensaje de commit'/>
 				</div>
@@ -359,4 +359,17 @@ export const RepositoryPage = () => {
 	  /*****************************************************************************/
 	);
 }
+
+function merge (source, destination) {
+	source.files.forEach(file => {
+		const destinationFile = destination.files.find(f => f.filename === file.filename);
+		if (destinationFile && destinationFile.version < file.version) {
+			Object.assign(destinationFile, file);
+		}
+		if (!destinationFile){
+			destination.files = [...destination.files, file];
+		}
+	});	
+}
+
 export default RepositoryPage
