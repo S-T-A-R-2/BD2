@@ -1,8 +1,8 @@
 import React, {useState, useEffect, useRef} from 'react'
 import { useLocation, useNavigate }  from 'react-router-dom';
 import { updateBranches, getBranches, subscribe, checkSubscription,
-         makeLike, unmakeLike, makeDislike, unmakeDislike, getLiked, 
-         getDisliked, getVotes } from '../api/auth.js';
+         getCommits, createCommits, makeLike, unmakeLike, makeDislike,
+         unmakeDislike, getLiked, getDisliked, getVotes } from '../api/auth.js';
 import { Dropdown, FileBrowser} from '../components/Dropdown.js';
 import Dialog from '../components/Dialog.jsx'
 
@@ -346,6 +346,15 @@ export const RepositoryPage = () => {
 			branchesDocument.branches = [...branches, newBranch];
 			await updateBranches(branchesDocument, branchesDocument._id);
 			// Crear commit
+			const sourceBranch = {id: repository.owner + "/" + repository.name + "/" + "master"};
+			const sourceBranchCommits = (await getCommits(sourceBranch, repository._id)).data;
+			console.log(sourceBranchCommits);
+			const destinationBranch = repository.owner + "/" + repository.name + "/" + newBranchName;
+			const destinationBranchCommits = {
+				_id : destinationBranch,
+				files : sourceBranchCommits.files
+			}
+			await createCommits(destinationBranchCommits, repository._id);
 		}
 	}
 	//Quitar esto
