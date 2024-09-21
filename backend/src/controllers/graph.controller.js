@@ -291,8 +291,10 @@ export const getRecommendations = async (req, res) => {
 
   try {
     const result = await connectNeo4J(query);
-    res.status(200).json({ message: 'Recomendations gotten', message: message});
-    console.log(result);
+    const repos = result.records.map(record => record.get('e')); // 'e' is the variable in the query
+
+    res.status(200).json({ message: 'Recommendations retrieved', repos });
+    console.log(repos); 
   } catch (err) {
       console.error(`Error getting recomendations: ${err}`);
       res.status(500).json({ error: 'Error getting recomendations: ', details: err.message });
