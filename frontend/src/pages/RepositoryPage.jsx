@@ -242,30 +242,6 @@ export const RepositoryPage = () => {
 			</div>
 		);
 	};
-
-	const CommentsList = () => {
-		if (files.length > 0) {
-			return (
-				<div class="relative scroll-pb-6 size-[500px]">
-				  <ul role="list" class="p-6 divide-y divide-slate-100 bg-white text-black">
-				{files[currentFile].comments.map((comment, index) => (
-				  <li class="group/item flex py-4 first:pt-0 last:pb-0">
-					<div className="w-full cursor-pointer">
-						  <p class="text-sm font-medium text-slate-900">Fecha de creación: {comment.date}</p>
-						  <p class="text-sm font-medium text-slate-900">Usuario: {comment.userId}</p>
-						  <p class="text-sm font-medium text-slate-900">{comment.description}</p>
-					</div>
-					<a class="group/edit invisible hover:bg-slate-200 group-hover/item:visible" onClick={e => console.log(comment.date)}>
-						<button>Descargar</button>
-					</a>
-				  </li>
-				))}
-				  </ul>
-				</div>
-			)
-		}
-		
-	}
 	/*****************************************************************************/
 	const addFilesA = () => {
 		localStorage.setItem('currentBranch', JSON.stringify(actualBranch));
@@ -432,10 +408,6 @@ export const RepositoryPage = () => {
 				<div class="relative bg-zinc-800 rounded-md flex flex-col m-auto">
 					<h1>Archivos</h1>
 					<FilesList/>
-				</div>
-				<div class="relative left-[20px] bg-zinc-800 rounded-md flex flex-col m-auto">
-					<h1>Comentarios</h1>
-					<CommentsList/>
 				</div>
 			</div>
 
