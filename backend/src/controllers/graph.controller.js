@@ -283,7 +283,7 @@ export const getRecommendations = async (req, res) => {
       MATCH (t:Tag) -[:CATEGORIZES]-> (r)
       MATCH (t)-[:CATEGORIZES]-> (e:Repository)
       MATCH (a:User)-[:OWNS]->(e)
-      WHERE e <> r
+      WHERE e <> r AND a<>u
       RETURN DISTINCT a, e
       LIMIT 10;
     `,
@@ -300,6 +300,33 @@ export const getRecommendations = async (req, res) => {
   } catch (err) {
       console.error(`Error getting recomendations: ${err}`);
       res.status(500).json({ error: 'Error getting recomendations: ', details: err.message });
+  }
+};
+
+export const getOwnedRepos = async (req, res) => {
+  const {username} = req.query;
+  
+  console.log(username);
+
+  const query = {
+    operation: `
+      MATCH (u:User {username:$username})-[:OWNS]->(r:Repository)
+      RETURN u,r
+    `,
+    parameters: { username }
+  };
+
+  try {
+    const result = await connectNeo4J(query);
+    const ownedR = result.records.map( record => ({
+      repo: record.get('r'),
+      owner: record.get('u')
+    }));
+    
+    res.status(200).json({ message: 'Owned retrieved', ownedR }); 
+  } catch (err) {
+      console.error(`Error getting Owned: ${err}`);
+      res.status(500).json({ error: 'Error getting Owned: ', details: err.message });
   }
 };
 

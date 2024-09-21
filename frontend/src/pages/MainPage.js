@@ -2,7 +2,7 @@ import React, {useState, useEffect, useInsertionEffect} from 'react'
 import { Button,TextField } from '../components/Templates.js';
 import { useAuth } from '../context/AuthContext';
 import {useNavigate, useLocation} from 'react-router-dom'
-import { getRecommendations, getRepository } from '../api/auth.js';
+import { getRecommendations, getRepository, getOwnedRepos } from '../api/auth.js';
 
 const RecoTag = ({ recommendations,user }) => {
     const navigate = useNavigate();
@@ -11,12 +11,10 @@ const RecoTag = ({ recommendations,user }) => {
     if (!recommendations || recommendations.length == 0) {
       return (
         <div>
-          <h1 className='text-white text-3xl'>Recomendaciones 🗂️</h1>
-          <p>No hay recomendaciones</p>;
+          <p>No hay repositorios</p>
         </div>
       );
     }
-
     
     const handleRepositoryClick = async (ownerP, nameP) => {
       try {
@@ -36,11 +34,11 @@ const RecoTag = ({ recommendations,user }) => {
 
     return (
       <div>
-        <h1 className='text-white text-3xl'>Recomendaciones 🗂️</h1>
+        
         <ul>
           {recommendations.map(({ repo, owner }, index) => (
             <li key={index}>
-              <a  href="#"
+              <a  href="#" className="flex-justify-between text-black rounded-lg p-1 bg-white shadow-lg hover:bg-sky-500 group-hover:text-white text-sm font-semibold inline text-center"
                 onClick={(e) => {
                   handleRepositoryClick(owner.properties.username, repo.properties.name);
                 }}
@@ -52,13 +50,14 @@ const RecoTag = ({ recommendations,user }) => {
         </ul>
       </div>
     );
-  };
+};
 
 export const MainPage = () => {
 	//const [username, setUsername] = useState("Página principal");
 	const [username, setUsername] = useState(null);
 	const [password, setPassword] = useState(null);
   const [recommendations,setRecos] = useState([]);
+  const [ownedRepos, setOwned] = useState([]);
 	const { isAuthenticated, logout, user } = useAuth();
 	const navigate = useNavigate();
     useEffect(() => {
@@ -71,11 +70,23 @@ export const MainPage = () => {
           console.error('Error fetching recommendations:', error);
         }
       };
+
+      const fetchOwned = async (userName) => {
+        try {
+          const recos = await getOwnedRepos({ username: userName });
+          setOwned(recos.data.ownedR); 
+          
+        } catch (error) {
+          console.error('Error fetching owned:', error);
+        }
+      };
         
       if (isAuthenticated && user) {
         setUsername(user.username);
         setPassword(user.password);
         fetchRecommendations(user.username);      
+        fetchOwned(user.username);
+        console.log(ownedRepos);
       }
     }, [isAuthenticated, user]);
 
@@ -126,25 +137,10 @@ return (
 
 		<br/>
 		<br/>
-		<div>
-
-			<ul class="list-style-none" data-filterable-for="dashboard-repos-filter-left" data-filterable-type="substring">
-				<li class="private source no-description">
-					<div class="width-full d-flex mt-2">
-					<a data-hydro-click="{&quot;event_type&quot;:&quot;dashboard.click&quot;,&quot;payload&quot;:{&quot;event_context&quot;:&quot;REPOSITORIES&quot;,&quot;target&quot;:&quot;REPOSITORY&quot;,&quot;record_id&quot;:755713506,&quot;dashboard_context&quot;:&quot;user&quot;,&quot;dashboard_version&quot;:2,&quot;user_id&quot;:126714838,&quot;metadata&quot;:null,&quot;originating_url&quot;:&quot;https://github.com/dashboard/my_top_repositories?location=left&quot;}}" data-hydro-click-hmac="e1446803eaac4ef05363eb330e0ca42f74d4161c84c59a0aa96d59d870b139b5" data-hovercard-type="repository" data-hovercard-url="/GeraldlTzy/TEC_I_Semestre_2024/hovercard" class="mr-2 d-flex flex-items-center" href="/GeraldlTzy/TEC_I_Semestre_2024">          		
-					</a>        <div class="wb-break-word">
-					
-					<a data-hydro-click="{&quot;event_type&quot;:&quot;dashboard.click&quot;,&quot;payload&quot;:{&quot;event_context&quot;:&quot;REPOSITORIES&quot;,&quot;target&quot;:&quot;REPOSITORY&quot;,&quot;record_id&quot;:755713506,&quot;dashboard_context&quot;:&quot;user&quot;,&quot;dashboard_version&quot;:2,&quot;user_id&quot;:126714838,&quot;metadata&quot;:null,&quot;originating_url&quot;:&quot;https://github.com/dashboard/my_top_repositories?location=left&quot;}}" data-hydro-click-hmac="e1446803eaac4ef05363eb330e0ca42f74d4161c84c59a0aa96d59d870b139b5" data-hovercard-type="repository" data-hovercard-url="/GeraldlTzy/TEC_I_Semestre_2024/hovercard" class="color-fg-default lh-0 mb-2 markdown-title" href="/GeraldlTzy/TEC_I_Semestre_2024">
-						GeraldlTzy<span class="color-fg-muted">/</span>TEC_I_Semestre_2024
-					</a>        
-					</div>
-					</div>
-				</li>
-			</ul>
-        
-		  </div>
-
-      <RecoTag recommendations={recommendations} user={user}/>
+    <RecoTag recommendations={ownedRepos} user = {user}/>
+		
+    <h1 className='text-white text-3xl'>Recomendaciones 🗂️</h1>
+    <RecoTag recommendations={recommendations} user={user}/>
 
 	  </div>)
   }
