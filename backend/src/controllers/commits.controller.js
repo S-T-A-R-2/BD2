@@ -8,7 +8,10 @@ export const createCommits = async (req, res) => {
 export const getCommits = async (req, res) => {
     const {id} = req.query;
     const query = { selector: { _id : id.id } }
+
+    console.log(id);
     const commits = (await couchDBCommit.find(query));
+    console.log(commits);
     res.json(commits.docs[0]);
 }
 
