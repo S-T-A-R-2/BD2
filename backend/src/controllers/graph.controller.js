@@ -450,14 +450,12 @@ export const getVotes = async (req, res) => {
 
   const query = {
     operation: `
-      MATCH (o:User)-[:OWNS]->(r:Repository {name: $repoName})
-      MATCH (a:User)-[:LIKES]->(r)
-      WITH COUNT(a) AS likeCount
-      MATCH (b:User)-[:DISLIKES]->(r)
-      WITH likeCount, COUNT(b) AS dislikeCount
-      RETURN (likeCount - dislikeCount) AS voteDifference
+      MATCH (o:User {username:$ownerName})-[:OWNS]->(r:Repository {name: $repoName})
+      OPTIONAL MATCH (a:User)-[:LIKES]->(r)
+      OPTIONAL MATCH (b:User)-[:DISLIKES]->(r)
+      RETURN (COUNT(a)-COUNT(b))  AS voteDifference
     `,
-    parameters: { repoName }
+    parameters: { repoName, ownerName }
   };
 
   try {
