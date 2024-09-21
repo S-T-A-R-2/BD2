@@ -65,9 +65,7 @@ function NewRepositoryPage() {
             }
     
             await createBranches(Branch, response._id);
-    
-            await createCommits(initialCommit, response._id);
-
+            console.log((await createCommits(initialCommit, response._id)).data);
         } catch (error) {
             console.error('Error:', error);
         }
