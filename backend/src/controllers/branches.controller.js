@@ -3,24 +3,15 @@ import {couchClient} from '../db.js'
 export const createBranches = async (req, res) => {
     console.log("Se creo la rama");
     console.log(req.body);
+    const response = await couchClient.insert(req.body);
+    res.json(response);
     
-    try {
-        const response = await couchClient.insert(req.body);
-        console.log('Insertion response:', response); // Log the response from CouchDB
-        res.json(response);
-    } catch (error) {
-        console.error('Error inserting into CouchDB:', error); // Log any errors
-        res.status(500).json({ message: 'Error inserting into CouchDB', error: error.message });
-    }
 }
-
 
 export const getBranches = async (req, res) => {
     const {repositoryId} = req.query;
     const query = { selector: { _id : repositoryId } }
     const branches = (await couchClient.find(query));
-    //branches.docs[0].branches[0].files[3].content = await db.attachment.get(branches.docs[0]._id, files[3].filename);
-    console.log(branches.docs[0].branches[0].files[3]);
     res.json(branches.docs[0]);
 }
 

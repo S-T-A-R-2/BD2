@@ -265,11 +265,11 @@ export const createTags = async (req, res) => {
   };
 
   try {
-    const result = await connectNeo4J(operation);
-    res.status(200).json({ message: 'Tags created and associated with the repository successfully', result: result });
-  } catch (err) {
-    console.error(`Error creating tags and associating with the repository: ${err}`);
-    res.status(500).json({ error: 'Error creating tags and associating with the repository', details: err.message });
+      const result = await connectNeo4J(operation);
+      res.status(200).json({ message: 'Tags made' });
+    } catch (err) {
+      console.error(`Error making tags: ${err}`);
+      res.status(500).json({ error: 'Error making tags: ', details: err.message });
   }
 };
 
@@ -281,8 +281,9 @@ export const getRecommendations = async (req, res) => {
       MATCH (u:User {username:$username})-[:subscribes]->(r:Repository)
       MATCH (t:Tag) -[:CATEGORIZES]-> (r)
       MATCH (t)-[:CATEGORIZES]-> (e:Repository)
+      MATCH (a:User)-[:OWNS]->(e)
       WHERE e <> r
-      RETURN DISTINCT e
+      RETURN DISTINCT a, e
       LIMIT 10;
     `,
     parameters: { username }
@@ -290,10 +291,11 @@ export const getRecommendations = async (req, res) => {
 
   try {
     const result = await connectNeo4J(query);
-    const repos = result.records.map(record => record.get('e')); // 'e' is the variable in the query
-
-    res.status(200).json({ message: 'Recommendations retrieved', repos });
-    console.log(repos); 
+    const recommendations = result.records.map( record => ({
+      repo: record.get('e'),
+      owner: record.get('a')
+    }));
+    res.status(200).json({ message: 'Recommendations retrieved', recommendations }); 
   } catch (err) {
       console.error(`Error getting recomendations: ${err}`);
       res.status(500).json({ error: 'Error getting recomendations: ', details: err.message });
