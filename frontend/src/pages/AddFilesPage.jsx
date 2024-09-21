@@ -1,7 +1,8 @@
 import React, {useState, useEffect} from 'react'
 import { getRepository, getBranches, updateBranches, createCommits, updateCommits, getCommits } from '../api/auth';
 import { useLocation, useNavigate }  from 'react-router-dom';
-import { Dropdown, FileBrowser, Button } from '../components/Dropdown.js';
+import { Dropdown, FileBrowser} from '../components/Dropdown.js';
+import {Button, Input} from '../components/Templates.js'
 import { useAuth } from '../context/AuthContext.jsx'
 
 export const AddFilesPage = () => {
@@ -113,13 +114,14 @@ export const AddFilesPage = () => {
 
     let committs = []
     /* Estructura de cada commit */
+    const [commitMessage, setCommitMessage] = useState(null);
     const preCommit = (oldFile, newFile) => {
         if (oldFile) {
             newFile.version = oldFile.version + 1;
         }
         const currentTime = new Date().toLocaleTimeString();
         const commit = {
-            description: "actualizar",
+            description: commitMessage,
             user: user.username,
             version: newFile.version,
             date: currentTime,
@@ -201,7 +203,7 @@ export const AddFilesPage = () => {
                             <li key={index}>{file.filename}</li>
                         ))}
                     </ul>
-                    <input type="text" className='text-black' placeholder='Mensaje de commit'/>
+                    <Input onChange={setCommitMessage} placeholder='Mensaje de commit'/>
 					<Button text="commit" onClick={commitAction}/>
 			</div>
         </div>
