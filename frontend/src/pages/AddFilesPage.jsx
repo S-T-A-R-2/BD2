@@ -127,7 +127,7 @@ export const AddFilesPage = () => {
                 if (updatedFile){
                     source = source.filter(f => f.filename !== file.filename);
                     preCommit(file, updatedFile);
-                    file._attachments.data = updatedFile._attachments.data;
+                    file._attachments[file.name].data = updatedFile._attachments[file.name].data;
                     file.version = file.version + 1;
                 }
             })

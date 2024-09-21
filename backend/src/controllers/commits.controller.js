@@ -5,6 +5,17 @@ export const createCommits = async (req, res) => {
     res.json(response);
 }
 
+export const getFileCommits = async (req, res) => {
+    const {filename} = req.query
+    try {
+        const commits = await couchDBCommit.view('ViewsDocs', 'filesViews', { key: filename });
+        res.json(commits.rows[0].value);
+    } catch (e) {
+        res.json([]);
+    }
+    
+}
+
 export const getCommits = async (req, res) => {
     const {id} = req.query;
     const query = { selector: { _id : id.id } }

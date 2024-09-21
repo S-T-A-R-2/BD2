@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useRef} from 'react'
 import { useLocation, useNavigate }  from 'react-router-dom';
 import { updateBranches, getBranches, subscribe, checkSubscription,
-         getCommits, createCommits, makeLike, unmakeLike, makeDislike,
+         getCommits, getFileCommits, createCommits, updateCommits, makeLike, unmakeLike, makeDislike,
          unmakeDislike, getLiked, getDisliked, getVotes } from '../api/auth.js';
 import { Dropdown, FileBrowser} from '../components/Dropdown.js';
 import Dialog from '../components/Dialog.jsx'
@@ -111,7 +111,6 @@ export const RepositoryPage = () => {
 	const [branch, setBranch] = useState("");
 	const [menuBranchOptions, setMenuBranchOption] = useState([]);
 	const [actualBranch, setActualBranch] = useState(0);
-	const [currentFile, setCurrentFile] = useState(0);
 	const location = useLocation();
   const [user, setUser] = useState(location.state ? location.state.user : null);
 	const [subscribed, setSubscribed] = useState(" ");
@@ -212,6 +211,120 @@ export const RepositoryPage = () => {
     }
 	/*****************************************************************************/
 	/**********************************Listas de objetos**************************/
+	const [currentFile, setCurrentFile] = useState(null);
+	const [displayVersion, setDisplayVersion] = useState(false);
+	
+	async function toggleVersions(file){
+		const query = {
+			selector: {
+			  _id: repository.owner + "/" + repository.name + "/" + branch.name
+			},
+			fields: ['name', 'age']
+		  };
+		const response = (await getFileCommits(file.filename, repository._id)).data;
+
+		setCurrentFile({
+			filename : file.filename,
+			name : file.name,
+			contentType : file._attachments[file.name].contentType,
+			commits: response
+		});
+
+	}
+
+	// Obtener el documento de commits de CouchDB
+	const [documentCommits, setDocumentCommits] = useState(null)
+    useEffect(() => {
+        const getCommitsAux = async () => {
+            const commitsId = {
+                id: repository.owner + "/" + repository.name + "/" + branch.name
+            };
+            setDocumentCommits((await getCommits(commitsId, repository._id)).data);
+        }
+        if (repository && branches){
+            getCommitsAux();
+        }
+    }, [repository, branches])
+	
+	const preCommit = async (oldFile, newFile) => {
+        const commit = {
+            description: "Rollback archivo " + oldFile.name + " a la versión " + newFile.version,
+            user: user.username,
+            version: oldFile.version + 1,
+            date: new Date().toLocaleTimeString(),
+            data: newFile._attachments[newFile.name].data
+        };
+        const addCommitToFile = (documentCommits.files.find(f => f.filename == newFile.filename))
+        addCommitToFile.commits = [...addCommitToFile.commits, commit]
+		await updateCommits(documentCommits, repository._id, documentCommits._id);
+    }
+
+	async function rollBackFile (oldFile) {
+		const currentFile = (branch.files.find(f => f.filename == oldFile.filename))
+		Object.assign(currentFile, oldFile);//reemplazar archivo en el documento de la rama
+		currentFile.version = currentFile.version + 1;
+		preCommit(currentFile, oldFile);//hacer commit del rollback
+		await updateBranches(branchesDocument, repository._id);
+	}
+	
+	
+	
+	useEffect(()=> {
+		if (currentFile) {
+			const ModalFileVersion = () => {
+				return (
+					<div className="relative scroll-pb-6 size-[500px]">
+						<p>Archivo: {currentFile.filename}</p>
+						<ul role="list" className="p-2 divide-y divide-slate-100 bg-white text-black">
+							{currentFile.commits.map((commit, index) => (
+								<li key={index} className="group/item flex py-4 first:pt-0 last:pb-0">
+									<div className="w-full cursor-pointer" >
+										<p className="text-sm font-medium text-slate-900">Versión: {commit.version}</p>
+									</div>
+									<div className="flex flex-col">
+										<a className="text-sm group/edit invisible hover:bg-slate-200 group-hover/item:visible"
+											onClick={e => downloadFile({
+												filename: currentFile.filename,
+												name: currentFile.name,
+												version: commit.version,
+												_attachments: {
+													[currentFile.name] : {
+													contentType: currentFile.contentType,
+													data: commit.data}
+												}
+											})}
+										>
+											<button>Descargar</button>
+										</a>
+										<a className="text-sm group/edit invisible hover:bg-slate-200 group-hover/item:visible"
+											onClick={e => rollBackFile({
+												filename: currentFile.filename,
+												name: currentFile.name,
+												version: commit.version,
+												_attachments: {
+													[currentFile.name] : {
+													contentType: currentFile.contentType,
+													data: commit.data}
+												}
+											})}
+										>
+											<button>Rollback</button>
+										</a>
+									</div>
+								</li>
+							))}
+						</ul>
+					</div>
+				)
+			}
+			setDisplayVersion(prev => !prev);
+			setDialogContent(<ModalFileVersion />);
+			toggleDialog();
+		}
+	}, [currentFile])
+
+
+
 	// Colocar lista de archivos en la interfaz
 	const FilesList = () => {
 		const navigate = useNavigate();
@@ -233,7 +346,7 @@ export const RepositoryPage = () => {
 									<button>Descargar</button>
 								</a>
 								<a className="text-sm invisible hover:bg-slate-100 group-hover/item:visible">
-									<button onClick={e => setCurrentFile(index)}>comentarios</button>
+									<button onClick={e => toggleVersions(file)}>versiones</button>
 								</a>
 							</div>
 						</li>
@@ -318,6 +431,7 @@ export const RepositoryPage = () => {
 				<p>Ingrese el nombre de la nueva rama:</p>
 				<Input placeholder="nombre de la rama"
 						onChange={setNewBracnhName}/>
+				<Button text={"Crear rama"} onClick={createNewBranch}/>
 			</div>
 		)
 	}
@@ -414,7 +528,7 @@ export const RepositoryPage = () => {
 			<Dialog 
 				toggleDialog={toggleDialog}
 				ref={dialogRef}
-				action={() => {createNewBranch(); toggleDialog();}}
+				action={() => {toggleDialog();}}
 			>
 				{dialogContent}
 			</Dialog>
