@@ -131,17 +131,12 @@ export const AddFilesPage = () => {
         }
         if (!oldFile){
             committs = [...committs, file];
-            console.log("Crear nuevo commit");
-            console.log(file)
-            console.log("Crear nuevo commit");
         }else{
             const addCommitToFile = (documentCommits.files.find(f => f.filename == newFile.filename))
             addCommitToFile.commits = [...addCommitToFile.commits, commit]
         }
     }
-
-    const [newFilesCommit, setNewFilesCommit] = useState(false);
-    /* Revisa cuales archivos ya se encuentran en la base de datos*/
+    // Agrega un nuevo commit en la base de datos si ya existía el archivo
     let source;
     async function searchFiles () {
         if (filesContent.length > 0) {
@@ -157,8 +152,7 @@ export const AddFilesPage = () => {
             })
         }
     };
-    //const [addOthers, setAddOthers] = useState(false);
-    /* Hace la estructura del commit para cada archivo*/
+    // Prepara el commit para los nuevos archivos agregados
     async function addOthers (){
         source.forEach(file => {
             preCommit(null, file);
