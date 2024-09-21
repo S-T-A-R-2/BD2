@@ -267,10 +267,10 @@ export const createTags = async (req, res) => {
   
   try {
       const result = await connectNeo4J(operation);
-      res.status(200).json({ message: 'Subscription made', message: message});
+      res.status(200).json({ message: 'Tags made');
     } catch (err) {
-      console.error(`Error subscribing to the repository: ${err}`);
-      res.status(500).json({ error: 'Error subscribing to the repository: ', details: err.message });
+      console.error(`Error making tags: ${err}`);
+      res.status(500).json({ error: 'Error making tags: ', details: err.message });
   }
  };
 
