@@ -1,11 +1,13 @@
 import React, {useState, useEffect} from 'react'
-import {useForm} from 'react-hook-form'
+import {useForm} from 'react-hook-form';
+import { useLocation, useNavigate }  from 'react-router-dom';
 import { createRepository, createRepoNeo, createBranches, getRepository, createCommits, createTagsNeo} from '../api/auth';
 import {TagsInput}  from 'react-tag-input-component';
 import '../reactTags.css';
 import { useAuth } from '../context/AuthContext';
 
 function NewRepositoryPage() {
+    const navigate = useNavigate();
     const { register, handleSubmit } = useForm();
     const [nameR, setName] = useState("name");
     const [descriptionR, setDescription] = useState("description");
@@ -55,6 +57,7 @@ function NewRepositoryPage() {
         } catch (error) {
             console.error('Error:', error);
         }
+        navigate(-1);
     }
 
     return (
