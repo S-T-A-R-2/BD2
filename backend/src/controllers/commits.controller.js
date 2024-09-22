@@ -6,10 +6,13 @@ export const createCommits = async (req, res) => {
 }
 
 export const getFileCommits = async (req, res) => {
-    const {filename} = req.query
+    const {query} = req.query
+    const filename = query.filename;
+    const branch = query.branch
     try {
         const commits = await couchDBCommit.view('ViewsDocs', 'filesViews', { key: filename });
-        res.json(commits.rows[0].value);
+        const fileCommits = (commits.rows.find(b => b.id == branch));
+        res.json(fileCommits.value);
     } catch (e) {
         res.json([]);
     }
