@@ -2,7 +2,8 @@ import React, {useState, useEffect, useRef} from 'react'
 import { useLocation, useNavigate }  from 'react-router-dom';
 import { updateBranches, getBranches, subscribe, checkSubscription,
          getCommits, getFileCommits, createCommits, updateCommits, makeLike, unmakeLike, makeDislike,
-         unmakeDislike, getLiked, getDisliked, getVotes } from '../api/auth.js';
+         unmakeDislike, getLiked, getDisliked, getVotes, deleteFile } from '../api/auth.js';
+
 import { Dropdown, FileBrowser} from '../components/Dropdown.js';
 import Dialog from '../components/Dialog.jsx'
 
@@ -147,7 +148,7 @@ export const RepositoryPage = () => {
 		};
 		getBranchesAux();
 	}, [repository]);
-	
+
 	useEffect(() => {
 		if (branches) {
 			const current = branches[actualBranch];
@@ -161,7 +162,6 @@ export const RepositoryPage = () => {
 	//Revisa si el usuario esta suscrito
 	const check = () => { 
 		if (user && !user.username.localeCompare(repository.owner)) {
-			console.log("NO OUNER");
 			setNotOwner(false);
 		} else 
 		if (user && repository) {
@@ -207,6 +207,12 @@ export const RepositoryPage = () => {
         document.body.removeChild(element);
         URL.revokeObjectURL(element.href);
     }
+
+	/******************************Borrar archivos*****************************/
+	const handleDeleteFile = (index) => {
+		deleteFile(files[index].filename, repository._id, branch.name);
+	}
+
 	/*****************************************************************************/
 	/**********************************Listas de objetos**************************/
 	const [currentFile, setCurrentFile] = useState(null);
@@ -346,6 +352,9 @@ export const RepositoryPage = () => {
 								<a className="text-sm invisible hover:bg-slate-100 group-hover/item:visible">
 									<button onClick={e => toggleVersions(file)}>versiones</button>
 								</a>
+								<a className="text-sm invisible hover:bg-slate-100 group-hover/item:visible">
+									<button onClick={e => handleDeleteFile(index)}>borrar</button>
+								</a>
 							</div>
 						</li>
 					))}
@@ -353,6 +362,30 @@ export const RepositoryPage = () => {
 			</div>
 		);
 	};
+
+	const CommentsList = () => {
+		if (files.length > 0 && files[currentFile].comments) {
+			return (
+				<div class="relative scroll-pb-6 size-[500px]">
+				  <ul role="list" class="p-6 divide-y divide-slate-100 bg-white text-black">
+				{files[currentFile].comments.map((comment, index) => (
+				  <li class="group/item flex py-4 first:pt-0 last:pb-0">
+					<div className="w-full cursor-pointer">
+						  <p class="text-sm font-medium text-slate-900">Fecha de creación: {comment.date}</p>
+						  <p class="text-sm font-medium text-slate-900">Usuario: {comment.userId}</p>
+						  <p class="text-sm font-medium text-slate-900">{comment.description}</p>
+					</div>
+					<a class="group/edit invisible hover:bg-slate-200 group-hover/item:visible" onClick={e => console.log(comment.date)}>
+						<button>Descargar</button>
+					</a>
+				  </li>
+				))}
+				  </ul>
+				</div>
+			)
+		}
+		
+	}
 	/*****************************************************************************/
 	const addFilesA = () => {
 		localStorage.setItem('currentBranch', JSON.stringify(actualBranch));
