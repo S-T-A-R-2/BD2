@@ -9,16 +9,7 @@ import Dialog from '../components/Dialog.jsx'
 
 import {Input, Button} from '../components/Templates.js'
 
-export const ModalCreateBranch = () => {
-	return (
-		<div className='bg-zinc-800 w-[300px] h-[200px] m-auto text-white'>
-			<form>
-				<p>Ingrese el nombre de la nueva rama:</p>
-				<Input placeholder="nombre de la rama"/>
-			</form>
-		</div>
-	)
-}
+
 
 const LikeDislikeButtons = ({ user, repository }) => {
   const [isLiked, setIsLiked] = useState(false);
@@ -425,18 +416,26 @@ export const RepositoryPage = () => {
 
 	}
 
-	const [newBranchName, setNewBranchName] = useState(null);
+	const [newBranchName, setNewBBranchName] = useState("");
+	const branchNameRef = useRef('');
+
+    const handleChange = (e) => {
+        setNewBBranchName(e.target.value);
+        branchNameRef.current = e.target.value;
+    };
 	const ModalCreateBranch = () => {
 		return (
 			<div>
 				<p>Ingrese el nombre de la nueva rama:</p>
-				<Input placeholder="nombre de la rama"
-						onChange={async () => {await setNewBranchName()}}/>
-				<button onClick={async () => { console.log("Se presiona"); (await createNewBranch());}}>Crear rama</button>
+				<input type="text"
+          				className="w-full bg-zinc-700 text-white px-4 py-2 rounded-md my-2"
+						placeholder="nombre de la rama"
+						onChange={e => handleChange(e)}/>
+				<button onClick={async () => { console.log("Se presiona"); (await createNewBranch(branchNameRef.current));}}>Crear rama</button>
 			</div>
 		)
 	}
-	const createNewBranch = async () => {
+	const createNewBranch = async (newBranchName) => {
 		if(newBranchName) {
 			const newBranch = {
 				name: newBranchName,
@@ -515,12 +514,16 @@ export const RepositoryPage = () => {
 					<FilesList/>
 				</div>
 			</div>
-			<Dialog 
-				toggleDialog={toggleDialog}
-				ref={dialogRef}
+			<dialog
+            	ref={dialogRef}
 			>
-				{dialogContent}
-			</Dialog>
+				<div className='bg-zinc-800 m-auto text-white shadow-lg rounded-lg m-auto p-6 max-w-lg'>
+					{dialogContent}
+					<Button onClick={toggleDialog} text={"Cerrar"}/>
+				</div>
+			</dialog>
+
+			
 	  </div>
 	  /*****************************************************************************/
 	);
