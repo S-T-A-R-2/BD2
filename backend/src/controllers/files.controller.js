@@ -1,9 +1,6 @@
 import {couchClient} from '../db.js'
 
 export const createFile = async (req, res) => {
-    console.log(req.body);
-    //var async = require('async');
-    //const fs = require('fs');
     await couchClient.insert(req.body);
 }
 

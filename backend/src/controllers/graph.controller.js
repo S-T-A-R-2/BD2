@@ -32,8 +32,6 @@ export const createUser = async (req, res) => {
 export const createRepository = async (req, res) => {
   const { owner, name } = req.body;
 
-  console.log(owner);
-
   if (!owner || !name) {
     return res.status(400).json({ error: 'Username and repository name are required' });
   }

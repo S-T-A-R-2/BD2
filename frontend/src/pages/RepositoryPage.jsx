@@ -214,8 +214,6 @@ export const RepositoryPage = () => {
 	async function toggleVersions(file){
 		const idBranch = repository.owner + "/" + repository.name + "/" + branch.name;
 		const response = (await getFileCommits({filename : file.filename, branch : idBranch}, repository._id)).data;
-		console.log("commitd")
-		console.log(response);
 		setCurrentFile({
 			filename : file.filename,
 			name : file.name,

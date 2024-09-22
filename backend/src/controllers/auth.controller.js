@@ -32,12 +32,7 @@ export const register = async (req, res) => {
         const userJson = JSON.stringify(user);
 
         await redisClient.set(username, userJson);
-        /*await redisClient.hSet(username, {
-        email: email,
-        password: password
-        });
-        const usersaved = redisClient.hGet(username);*/
-
+        
         const token = await createAccessToken({ id: username, username });
         res.cookie('token', token, {
             sameSite: 'none',

@@ -1,8 +1,6 @@
 import {couchClient} from '../db.js'
 
 export const createBranches = async (req, res) => {
-    console.log("Se creo la rama");
-    console.log(req.body);
     const response = await couchClient.insert(req.body);
     res.json(response);
     
