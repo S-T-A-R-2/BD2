@@ -124,12 +124,10 @@ export const RepositoryPage = () => {
 		const getBranchesAux = async () => {
 			if (repository) {
 				try {
-					console.log('Repository ID:', repository._id); // Log the repository ID
 					const response = (await getBranches({ repositoryId: repository._id })).data;
 					
 					setBranchesDocument(response);
 					if (response && response.branches) {
-						console.log('Branches fetched:', response.branches); // Log the branches
 						setBranches(response.branches);
 					} else {
 						console.error('Branches not found in the response');
