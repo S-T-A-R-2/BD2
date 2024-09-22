@@ -191,6 +191,7 @@ if (!username || !repositoryName) {
 
   };
   const result = await connectNeo4J(query);
+  console.log("ajá?",result.records);
   if (result.records[0]) {
     res.status(200).json({ message: 'Subscription exists', message: "Suscrito"});
   } else {
