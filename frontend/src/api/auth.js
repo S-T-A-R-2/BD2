@@ -59,6 +59,11 @@ export const updateCommits = (commits, repositoryId, commitsId) => axios.put(`/r
 export const getCommits = (id, repositoryId) => axios.get(`/repositories/${repositoryId}/commits`, {
   params: {id}
 });
+
+
+export const deleteFile = async (fileId, repositoryId, branchId) => axios.put(`/repositories/${repositoryId}/delete`,{fileId}, {
+  params: {repositoryId, branchId}
+
 export const getFileCommits = (filename, repositoryId) => axios.get(`/repositories/${repositoryId}/commits/${repositoryId}`, {
   params: {filename}
 });
