@@ -39,19 +39,7 @@ function NewRepositoryPage() {
                 branches: [
                   {
                     name: "master",
-                    files: [
-                      {
-                        filename: "Readme.md",
-                        content: "# Readme file",
-                        comments: [
-                          {
-                            userId: "567",
-                            date: "13-09-2024",
-                            description: "Soy un comentario"
-                          }
-                        ]
-                      }
-                    ]
+                    files: []
                   }
                 ]
             };
