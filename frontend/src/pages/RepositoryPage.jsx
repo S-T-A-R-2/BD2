@@ -340,7 +340,7 @@ export const RepositoryPage = () => {
 		};
 
 		return (
-			<div className="relative scroll-pb-6 size-[500px]">
+			<div className="relative scroll-pb-6 size-[500px] overflow-y-scroll border border-black">
 				<ul role="list" className="p-2 divide-y divide-slate-100 bg-white text-black">
 					{displayedFiles.map((file, index) => (
 						<li key={index} className="group/item flex py-4 first:pt-0 last:pb-0">
@@ -520,12 +520,13 @@ export const RepositoryPage = () => {
 						text="historial de commits" 
 						onClick={e => console.log("Hola")}
 					/>
+					{(branch.name !== "master") && (
 					<Button 
 						text={mergeText} 
 						onClick={merge}
 						args={[branch, branches[0]]}
-					/>					
-					<input type="text" className='text-black' placeholder='Mensaje de commit'/>
+					/>
+					)}
 				</div>
 			</div>
 			)}
