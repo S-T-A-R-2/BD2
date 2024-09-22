@@ -1,7 +1,8 @@
 import React, {useState, useEffect} from 'react'
 import { getRepository, getBranches, updateBranches, createCommits, updateCommits, getCommits } from '../api/auth';
 import { useLocation, useNavigate }  from 'react-router-dom';
-import { Dropdown, FileBrowser, Button } from '../components/Dropdown.js';
+import { Dropdown, FileBrowser} from '../components/Dropdown.js';
+import {Button, Input} from '../components/Templates.js'
 import { useAuth } from '../context/AuthContext.jsx'
 
 export const AddFilesPage = () => {
@@ -40,31 +41,7 @@ export const AddFilesPage = () => {
 	
     /* Lee cada documento cargado en la interfaz y crea su estructura
      * para ser almacenado */
-    const handleFileChange = (event) => {
-        const files = event.target.files;
-        const fileArray = Array.from(files);
-        
-        const reader = new FileReader();
-        fileArray.forEach(file => {
-            reader.onloadend = () => {
-                const base64String = reader.result.split(",")[1];
-                setFilesContent(prev => [...prev,
-                {   filename: file.name,
-                    name: file.name,
-                    version: 0,
-                    _attachments: {
-                        [file.name] : {
-                        contentType: file.type,
-                        data: base64String}
-                    }
-                }]);
-            };
-            reader.readAsDataURL(file);
-        });
-        setSelectedFiles(fileArray);
-    };
-
-    function handleDirectoryChange(event){
+    const handleFileChange = (isDirectory, event) => {
         const files = event.target.files;
         const fileArray = Array.from(files);
         const updatedFilesContent = [];
@@ -73,16 +50,21 @@ export const AddFilesPage = () => {
             const reader = new FileReader();
             reader.onloadend = () => {
                 const base64String = reader.result.split(",")[1];
+                let path;
+                if (isDirectory){
+                    path = file.webkitRelativePath
+                } else {
+                    path = file.name
+                }
 
                 updatedFilesContent.push({
-                    filename: file.webkitRelativePath,
+                    filename: path,
                     name: file.name,
                     version: 0,
                     _attachments: {
-                        [file.name]: {
-                            contentType: file.type,
-                            data: base64String
-                        }
+                        [file.name] : {
+                        contentType: file.type,
+                        data: base64String}
                     }
                 });
                 if (updatedFilesContent.length === fileArray.length) {
@@ -91,10 +73,8 @@ export const AddFilesPage = () => {
             };
             reader.readAsDataURL(file);
         });
-        setSelectedFiles(prev => [...prev, ...fileArray]);
-    }
-
-    const [commits, setCommits] = useState([]);
+        setSelectedFiles(fileArray);
+    };
     const [documentCommits, setDocumentCommits] = useState(null)
     
     /* Construye el id del documento */
@@ -113,13 +93,14 @@ export const AddFilesPage = () => {
 
     let committs = []
     /* Estructura de cada commit */
+    const [commitMessage, setCommitMessage] = useState(null);
     const preCommit = (oldFile, newFile) => {
         if (oldFile) {
             newFile.version = oldFile.version + 1;
         }
         const currentTime = new Date().toLocaleTimeString();
         const commit = {
-            description: "actualizar",
+            description: commitMessage,
             user: user.username,
             version: newFile.version,
             date: currentTime,
@@ -146,7 +127,7 @@ export const AddFilesPage = () => {
                 if (updatedFile){
                     source = source.filter(f => f.filename !== file.filename);
                     preCommit(file, updatedFile);
-                    file._attachments.data = updatedFile._attachments.data;
+                    file._attachments[file.name].data = updatedFile._attachments[file.name].data;
                     file.version = file.version + 1;
                 }
             })
@@ -186,14 +167,14 @@ export const AddFilesPage = () => {
                             type="file" 
                             webkitdirectory="true"
                             multiple
-                            onChange={handleDirectoryChange}
+                            onChange={e => handleFileChange(true, e)}
                         />
                         <input 
                             class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" 
                             id="multiple_files" 
                             type="file" 
                             multiple
-                            onChange={handleFileChange}
+                            onChange={e => handleFileChange(false, e)}
                         />
                     </div>
                     <ul>
@@ -201,7 +182,7 @@ export const AddFilesPage = () => {
                             <li key={index}>{file.filename}</li>
                         ))}
                     </ul>
-                    <input type="text" className='text-black' placeholder='Mensaje de commit'/>
+                    <Input onChange={setCommitMessage} placeholder='Mensaje de commit'/>
 					<Button text="commit" onClick={commitAction}/>
 			</div>
         </div>

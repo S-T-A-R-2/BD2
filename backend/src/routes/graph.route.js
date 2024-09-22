@@ -9,6 +9,7 @@ import {createUser,
         checkSubscription,
         createTags,
         getRecommendations,
+        getOwnedRepos,
         makeLike,
         unmakeLike,
         makeDislike,
@@ -30,6 +31,7 @@ router.post('/repository/:id', subscribe);
 router.put('/repository/:id', checkSubscription);
 router.post('/create-tag', createTags);
 router.get('/get-reco', getRecommendations);
+router.get('/get-owned', getOwnedRepos);
 router.post('/make-like', makeLike);
 router.post('/unmake-like', unmakeLike);
 router.post('/make-dislike', makeDislike);
