@@ -6,6 +6,7 @@ import {Button, Input} from '../components/Templates.js'
 import { useAuth } from '../context/AuthContext.jsx'
 
 export const AddFilesPage = () => {
+    const navigate = useNavigate();
     const { user } = useAuth();
     const location = useLocation();
     const [repository, setRepository] = useState(null);
@@ -149,11 +150,11 @@ export const AddFilesPage = () => {
         await updateBranches(repository, id);
         documentCommits.files = [...documentCommits.files, ...committs];
         await updateCommits(documentCommits, id, documentCommits._id);
+        navigate(-1);
     }
 
     return (
         <div className='relative text-white bg-zinc-800 flex flex-col m-auto h-screen'>
-            <p>Hola mundo</p>
             <div className='relative m-auto'>
 				{/*<p>Sección de commits</p>*/}
 				

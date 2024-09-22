@@ -41,6 +41,7 @@ const LikeDislikeButtons = ({ user, repository }) => {
     const fetchVotes = async () =>{
       try{
         const ammount = await getVotes(parameters);
+        console.log(ammount);
         setVotes(ammount.data.final);
       } catch (err) {
         console.log('Error fetching votes', err);
@@ -104,6 +105,7 @@ export const RepositoryPage = () => {
 	const [branches, setBranches] = useState(null);
 	const [repository, setRepository] = useState(() => {
         const savedRepository = localStorage.getItem('repository');
+        console.log(savedRepository);
         return savedRepository ? JSON.parse(savedRepository) : null;
     });
 	const [branch, setBranch] = useState("");
@@ -399,16 +401,8 @@ export const RepositoryPage = () => {
 		}));
 		setMenuBranchOption(options);
 	}
-	/*****************************************************************************/
-	
-
-
-	
+	/*****************************************************************************/	
 	let displayedFiles = files;
-
-
-	
-	
 	/**************************Crear nueva rama***********************************/
 	const [dialogContent, setDialogContent] = useState(null);
 	const dialogRef = useRef(null);
@@ -422,14 +416,14 @@ export const RepositoryPage = () => {
 
 	}
 
-	const [newBranchName, setNewBracnhName] = useState(null);
+	const [newBranchName, setNewBranchName] = useState(null);
 	const ModalCreateBranch = () => {
 		return (
 			<div>
 				<p>Ingrese el nombre de la nueva rama:</p>
 				<Input placeholder="nombre de la rama"
-						onChange={setNewBracnhName}/>
-				<Button text={"Crear rama"} onClick={createNewBranch}/>
+						onChange={async () => {await setNewBranchName()}}/>
+				<button onClick={async () => { console.log("Se presiona"); (await createNewBranch());}}>Crear rama</button>
 			</div>
 		)
 	}
@@ -453,17 +447,6 @@ export const RepositoryPage = () => {
 			await createCommits(destinationBranchCommits, repository._id);
 		}
 	}
-	//Quitar esto
-	useEffect(()=>{
-		async function updateBranchesAux(){
-			//branchesDocument.branches = branches;
-			console.log(branches);
-        	//await updateBranches(branchesDocument, branchesDocument._id);
-		}
-		if (branches){
-			updateBranchesAux();
-		}
-	}, [branches])
 	/*****************************************************************************/
 	/***********************************Interfaz**********************************/
 	const mergeText = `merge ${branch.name} to master`
@@ -522,29 +505,38 @@ export const RepositoryPage = () => {
 					<FilesList/>
 				</div>
 			</div>
-
 			<Dialog 
 				toggleDialog={toggleDialog}
 				ref={dialogRef}
-				action={() => {toggleDialog();}}
 			>
 				{dialogContent}
 			</Dialog>
 	  </div>
 	  /*****************************************************************************/
 	);
-}
-
-function merge (source, destination) {
-	source.files.forEach(file => {
-		const destinationFile = destination.files.find(f => f.filename === file.filename);
-		if (destinationFile && destinationFile.version < file.version) {
-			Object.assign(destinationFile, file);
-		}
-		if (!destinationFile){
-			destination.files = [...destination.files, file];
-		}
-	});	
+	async function merge (source, destination) {
+		const destinationId = {
+			id: repository.owner + "/" + repository.name + "/" + "master"
+		};
+		const sourceId = {
+			id: repository.owner + "/" + repository.name + "/" + branch.name
+		};
+		const masterCommit = (await getCommits(destinationId, repository._id)).data;
+		const sourceCommit = (await getCommits(sourceId, repository._id)).data;
+		
+		source.files.forEach(file => {
+			const destinationFile = destination.files.find(f => f.filename === file.filename);
+			if (destinationFile && destinationFile.version < file.version) {
+				Object.assign(destinationFile, file);
+			}
+			if (!destinationFile){
+				destination.files = [...destination.files, file];
+				const fileSourceCommits = sourceCommit.files.find(f => f.filename === file.filename);
+				masterCommit.files = [...masterCommit.files, fileSourceCommits];
+			}
+		});	
+		await updateCommits(masterCommit,  repository._id);
+	}
 }
 
 export default RepositoryPage
