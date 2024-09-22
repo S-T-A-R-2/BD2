@@ -280,13 +280,11 @@ export const getRecommendations = async (req, res) => {
 
   const query = {
     operation: `
-      MATCH (u:User {username:$username})-[:subscribes]->(r:Repository)
-      MATCH (u)-[:OWNS]->(x:Repository)
+      OPTIONAL MATCH (u:User {username:$username})-[:subscribes|OWNS]->(r:Repository)
       MATCH (t:Tag) -[:CATEGORIZES]-> (r)
-      MATCH (t)-[:CATEGORIZES]->(x)
       MATCH (t)-[:CATEGORIZES]-> (e:Repository)
       MATCH (a:User)-[:OWNS]->(e)
-      WHERE e <> r AND e <> x AND a<>u
+      WHERE e <> r AND a<>u
       RETURN DISTINCT a, e
       LIMIT 10;
     `,
